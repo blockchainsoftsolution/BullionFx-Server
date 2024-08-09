@@ -207,23 +207,23 @@ class AuthController extends Controller
                     } else {
                         $data['success'] = false;
                         $data['message'] = __("Email or Password doesn't match");
-                        return response()->json($data);
+                        return response()->json($data, 400);
                     }
                 } else {
                     $data['success'] = false;
                     $data['message'] = __("You have no login access");
                     Auth::logout();
-                    return response()->json($data);
+                    return response()->json($data, 404);
                 }
             } else {
                 $data['success'] = false;
-                $data['message'] = __("You have no account,please register new account");
-                return response()->json($data);
+                $data['message'] = __("You have no account, please register new account");
+                return response()->json($data, 404);
             }
         } catch (\Exception $e) {
             storeException('signIn', $e->getMessage());
             $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
-            return response()->json($response);
+            return response()->json($response, 500);
         }
 
     }
