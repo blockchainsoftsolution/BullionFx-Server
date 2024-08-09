@@ -137,7 +137,7 @@ class AuthController extends Controller
                                     $data['message'] = __('Please verify two factor authentication to get access ');
                                 }
                                 if ($user->g2f_enabled == STATUS_DEACTIVE && $user->email_enabled == STATUS_DEACTIVE && $user->phone_enabled == STATUS_DEACTIVE) {
-                                    $data['access_token'] = $token;
+                                    $data['token'] = $token;
                                     $data['access_type'] = 'Bearer';
                                 }
 
@@ -165,14 +165,14 @@ class AuthController extends Controller
                                     $data['message'] = __('Your email is not verified yet. Please verify your mail.');
                                     Auth::logout();
 
-                                    return response()->json($data);
+                                    return response()->json($data, 401);
                                 } catch (\Exception $e) {
                                     $data['email_verified'] = $user->is_verified;
                                     $data['success'] = false;
                                     $data['message'] = $e->getMessage();
                                     Auth::logout();
 
-                                    return response()->json($data);
+                                    return response()->json($data, 500);
                                 }
                             }
                         } elseif ($user->status == STATUS_SUSPENDED) {
@@ -180,29 +180,29 @@ class AuthController extends Controller
                             $data['success'] = false;
                             $data['message'] = __("Your account has been suspended. please contact support team to active again");
                             Auth::logout();
-                            return response()->json($data);
+                            return response()->json($data, 401);
                         } elseif ($user->status == STATUS_DELETED) {
                             $data['email_verified'] = 1;
                             $data['success'] = false;
                             $data['message'] = __("Your account has been deleted. please contact support team to active again");
                             Auth::logout();
-                            return response()->json($data);
+                            return response()->json($data, 401);
                         } elseif ($user->status == STATUS_PENDING) {
                             $data['email_verified'] = 1;
                             $data['success'] = false;
                             $data['message'] = __("Your account has been pending for admin approval. please contact support team to active again");
                             Auth::logout();
-                            return response()->json($data);
+                            return response()->json($data, 401);
                         } elseif ($user->status == STATUS_USER_DEACTIVATE) {
                             $data['email_verified'] = 1;
                             $data['success'] = false;
                             $data['message'] = __("Your account has been deactivated. please contact support team to active again");
                             Auth::logout();
-                            return response()->json($data);
+                            return response()->json($data, 401);
                         } else {
                             $data['success'] = false;
                             $data['message'] = __("User not found!");
-                            return response()->json($data);
+                            return response()->json($data, 401);
                         }
                     } else {
                         $data['success'] = false;
@@ -400,13 +400,12 @@ class AuthController extends Controller
         }
     }
 
-    public function logOutApp()
+    public function logOutApp(Request $request)
     {
         Session::forget('g2f_checked');
         Session::flush();
         Cookie::queue(Cookie::forget('accesstokenvalue'));
-        $user = Auth::user()->token();
-        $user->revoke();
-        return response()->json(['success' => true, 'data' => [], 'message' => __('Logout successfully!')]);
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['success' => true, 'data' => [], 'message' => __('Logout successfully!'), 'user' => $request->user()->email]);
     }
 }
