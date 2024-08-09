@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1499b19ec6a936cabde698b61bf6fc7c",
+    "content-hash": "f095909c6b912c92f4fffbb16b86fa94",
     "packages": [
         {
             "name": "anhskohbo/no-captcha",
@@ -69,6 +69,63 @@
                 "source": "https://github.com/anhskohbo/no-captcha/tree/3.6.0"
             },
             "time": "2024-03-13T02:22:17+00:00"
+        },
+        {
+            "name": "banxa/php-sdk",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BanxaOfficial/php-sdk.git",
+                "reference": "0b06575b0c51391f7497ae18ff222fbe79547fe5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BanxaOfficial/php-sdk/zipball/0b06575b0c51391f7497ae18ff222fbe79547fe5",
+                "reference": "0b06575b0c51391f7497ae18ff222fbe79547fe5",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.5",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Banxa\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Banxa",
+                    "email": "support-partnerships@banxa.com"
+                }
+            ],
+            "description": "Banxa Official PHP API SDK for partners",
+            "homepage": "https://banxa.com",
+            "keywords": [
+                "banxa",
+                "crypto",
+                "cryptocurrencies",
+                "cryptocurrency",
+                "fiattocrypto",
+                "offramp",
+                "onramp",
+                "php",
+                "sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/BanxaOfficial/php-sdk/issues",
+                "source": "https://github.com/BanxaOfficial/php-sdk/tree/v1.0.4"
+            },
+            "time": "2024-02-29T00:11:01+00:00"
         },
         {
             "name": "brick/math",

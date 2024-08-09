@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\ApiUser;
+use App\Http\Middleware\UserLastActivity;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'check_demo' => App\Http\Middleware\CheckDemoMiddleware::class,
             'checkApi' => App\Http\Middleware\CheckApi::class,
             'maintenanceMode' => App\Http\Middleware\MaintenanceModeCheckMiddleware::class,
+            'api-user' => ApiUser::class,
+            'generateSecret' => \App\Http\Middleware\GenerateSecretKey::class,
+            'last_seen' => UserLastActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

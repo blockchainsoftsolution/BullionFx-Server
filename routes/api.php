@@ -70,7 +70,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         });
 
 
-        // Route::group(['namespace' => 'Api\User', 'middleware' => ['auth:sanctum', 'api-user', 'generateSecret', 'last_seen']], function () {
+        Route::group(['namespace' => 'Api\User', 'middleware' => ['auth:sanctum', 'api-user', 'generateSecret', 'last_seen']], function () {
         //     // profile
 
         //     Route::get('notifications', 'ProfileController@userNotification');
@@ -88,6 +88,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::post('upload-passport', 'ProfileController@uploadPassport');
         //     Route::post('upload-driving-licence', 'ProfileController@uploadDrivingLicence');
         //     Route::post('upload-voter-card', 'ProfileController@uploadVoterCard');
+            Route::post('kyc-verify', 'ProfileController@banxaKycVerify');
         //     Route::get('kyc-details', 'ProfileController@kycDetails');
         //     Route::get('user-setting', 'ProfileController@userSetting');
         //     Route::get('language-list', 'ProfileController@languageList');
@@ -195,7 +196,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //         Route::get('test', 'FutureTradeController@test');
         //     });
 
-        // });
+        });
         // Route::group(['namespace' => 'Api\User', 'group' => 'gift_card', 'prefix' => 'gift-card'], function () {
         //     Route::get('gift-card-main-page', 'GiftCardController@giftCardMainPageData');
         //     Route::get('gift-cards', 'GiftCardController@giftCards');
