@@ -340,14 +340,18 @@ class AuthController extends Controller
                 return response()->json($response);
             }
             $google2fa = new Google2FA();
-            $google2fa->setAllowInsecureCallToGoogleApis(true);
+            // $google2fa->setAllowInsecureCallToGoogleApis(true);
             $data['google2fa_secret'] = $google2fa->generateSecretKey();
             $default = settings();
-            $google2fa_url = $google2fa->getQRCodeGoogleUrl(
-                isset($default['app_title']) && !empty($default['app_title']) ? $default['app_title'] : 'Tredexpro',
-                isset(Auth::user()->email) && !empty(Auth::user()->email) ? Auth::user()->email : 'admin@email.com',
-                $data['google2fa_secret']
-            );
+            // $google2fa_url = $google2fa->getQRCodeGoogleUrl(
+            //     isset($default['app_title']) && !empty($default['app_title']) ? $default['app_title'] : 'Tredexpro',
+            //     isset(Auth::user()->email) && !empty(Auth::user()->email) ? Auth::user()->email : 'admin@bullionfx.com',
+            //     $data['google2fa_secret']
+            // );
+            $issuer = urlencode(isset($default['app_title']) && !empty($default['app_title']) ? $default['app_title'] : 'BullionFX');
+            $accountName = urlencode(isset(Auth::user()->email) && !empty(Auth::user()->email) ? Auth::user()->email : 'admin@bullionfx.com');
+            $secret = urlencode($data['google2fa_secret']);
+            $google2fa_url = "otpauth://totp/{$issuer}:{$accountName}?secret={$secret}&issuer={$issuer}";
             $data['qrcode'] = $google2fa_url;
             return response()->json(["success" => true, "message" => __("Google authentication setup get successfully"), "data" => $data]);
         } catch (\Exception $e) {

@@ -2,6 +2,15 @@
 
 use App\Http\Controllers\Api\AuthController;
 
+// For Two factor
+Route::group(['namespace'=>'Api', 'middleware' => ['auth:sanctum','checkApi']], function (){
+    Route::get('two-factor-list','AuthController@twoFactorList')->name("twoFactorListApi");
+    Route::match(['GET','POST'],'/google-two-factor',[AuthController::class,'twoFactorGoogleSetup'])->name("twoFactorGoogleApi");
+    Route::post('save-two-factor','AuthController@twoFactorSave')->name("twoFactorSaveApi");
+    Route::post('send-two-factor','AuthController@twoFactorSend')->name("twoFactorSendApi");
+    Route::post('check-two-factor','AuthController@twoFactorCheck')->name("twoFactorCheckApi");
+});
+
 Route::group(['middleware' => 'maintenanceMode'], function () {
 
     // Route::group(['namespace' => 'Api\Public', 'prefix' => 'v1/markets', 'middleware' => 'publicSecret'], function () {
@@ -98,12 +107,12 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::get('user-kyc-settings-details', 'ProfileController@userKycSettingsDetails')->name('userKycSettingsDetails');
         //     Route::post('third-party-kyc-verified', 'ProfileController@thirdPartyKycVerified')->name('thirdPartyKycVerified');
 
-        //     Route::group(['middleware' => 'check_demo'], function () {
-        //         Route::post('google2fa-setup', 'ProfileController@google2faSetup');
+            Route::group(['middleware' => 'check_demo'], function () {
+                Route::post('google2fa-setup', [ProfileController::class, 'google2faSetup']);
         //         Route::get('setup-google2fa-login', 'ProfileController@setupGoogle2faLogin');
 
         //         Route::post('profile-delete-request', 'ProfileController@profileDeleteRequest');
-        //     });
+            });
 
         //     // coin
         //     Route::get('get-coin-list', 'CoinController@getCoinList');
