@@ -107,9 +107,6 @@ class UserRepository
 
     public function passwordChange($request, $user_id)
     {
-        if (env('APP_MODE') == 'demo') {
-            return ['success' => false, 'message' => __('Currently disable only for demo')];
-        }
         $response['success'] = false;
         $response['message'] = __('Invalid Request');
         try {

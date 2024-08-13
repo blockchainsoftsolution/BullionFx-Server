@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\User\ProfileController;
 
 // For Two factor
 Route::group(['namespace'=>'Api', 'middleware' => ['auth:sanctum','checkApi']], function (){
@@ -86,7 +87,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::post('notification-seen', 'ProfileController@userNotificationSeen');
         //     Route::get('activity-list', 'ProfileController@activityList');
         //     Route::post('update-profile', 'ProfileController@updateProfile');
-        //     Route::post('change-password', 'ProfileController@changePassword');
+            Route::post('change-password', [ProfileController::class, 'changePassword']);
         //     Route::post('generate-secret-key', 'ProfileController@generateSecretKey');
         //     Route::post('show-secret-key', 'ProfileController@showSecretKey');
 

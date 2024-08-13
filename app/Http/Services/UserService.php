@@ -628,7 +628,7 @@ class UserService
                         $user->g2f_enabled = '0';
                         $user->save();
                         $response = [
-                            'success' => false,
+                            'success' => true,
                             'data' => $user,
                             'message' => __('Google authentication code removed successfully')
                         ];

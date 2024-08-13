@@ -31,13 +31,13 @@ class ChangePasswordRequest extends FormRequest
             'password' =>[
                 'required',
                 'string',
-                'min:8',
-                'strong_pass',// must be at least 10 characters in length
-                'regex:/[a-z]/',      // must contain at least one lowercase letter
-                'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                'regex:/[0-9]/',      // must contain at least one digit
+                // 'min:8',
+                // 'strong_pass',// must be at least 10 characters in length
+                // 'regex:/[a-z]/',      // must contain at least one lowercase letter
+                // 'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                // 'regex:/[0-9]/',      // must contain at least one digit
             ],
-            'password_confirmation' => 'required|min:8|same:password'
+            // 'password_confirmation' => 'required|min:8|same:password'
         ];
 
         return $rules;
