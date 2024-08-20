@@ -34,6 +34,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('is_verified')->default(0);
             $table->string('password');
             $table->string('language')->default('en');
+            $table->string('currency_code',180)->default('AUD');
             $table->string('device_id')->nullable();
             $table->tinyInteger('device_type')->default(1);
             $table->tinyInteger('push_notification_status')->default(1);

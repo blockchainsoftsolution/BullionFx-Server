@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Model\ActivityLog;
-use App\Model\Notification;
+use App\Models\ActivityLog;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Http\Services\Logger;
 use App\Http\Services\UserService;
@@ -239,6 +239,22 @@ class ProfileController extends Controller
     }
 
     /**
+     * user preferred currency setup
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePreferredCurrency(Request $request)
+    {
+        try {
+            $response = $this->service->setupPreferredCurrency($request);
+        } catch (\Exception $e) {
+            storeException('google2faSetup', $e->getMessage());
+            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+        }
+        return response()->json($response);
+    }
+
+    /**
      * user language setup
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -300,7 +316,7 @@ class ProfileController extends Controller
 
             if(function_exists("getNotificationListt"))
             {
-                $support = getNotificationList();
+                $support = getNotificationListt();
                 $result = $support->merge($result);
 
             }
@@ -354,7 +370,7 @@ class ProfileController extends Controller
     }
 
     // verify KYC using banxa
-    public function banxaKycVerify()
+    public function banxaKycVerify($request)
     {
         $response = $this->thirdPartyKYCService->banxaKYCVerification($request);
         return response()->json($response);

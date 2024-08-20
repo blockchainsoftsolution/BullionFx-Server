@@ -673,6 +673,43 @@ class UserService
         return $response;
     }
 
+    // google 2fa setup process
+    public function setupPreferredCurrency($request)
+    {
+        $response['success'] = false;
+        $response['data'] = '';
+        $response['message'] = __('Invalid Request');
+        try {
+            if (empty($request->currency_code)) {
+                $response = [
+                    'success' => false,
+                    'data' => '',
+                    'message' => __('Currency code can not be empty')
+                ];
+                return $response;
+            }
+
+            $user = Auth::user();
+
+            $user->currency_code = $request->currency_code;
+            $user->save();
+            $response = [
+                'success' => true,
+                'data' => $user,
+                'message' => __('Preferred currency updated successfully')
+            ];
+        } catch (\Exception $e) {
+            storeException('setupPreferredCurrency', $e->getMessage());
+            $response = [
+                'success' => false,
+                'data' => '',
+                'message' => __('Something went wrong')
+            ];
+        }
+
+        return $response;
+    }
+
     // check google 2fa
     public function checkGoogle2fa($google2fa_secret, $code)
     {

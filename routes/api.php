@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SendGridEmailController;
 use App\Http\Controllers\Api\User\ProfileController;
+use App\Http\Controllers\Api\User\UserBankController;
+use App\Http\Controllers\Api\User\UserCardController;
 
 // For Two factor
 Route::group(['namespace'=>'Api', 'middleware' => ['auth:sanctum','checkApi']], function (){
@@ -29,6 +32,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
             Route::post('sign-in', [AuthController::class, 'signIn']);
             // Route::post('verify-email', 'AuthController@verifyEmail');
             // Route::post('resend-verify-email-code', 'AuthController@resendVerifyEmailCode');
+            Route::get('/test_email', [SendGridEmailController::class, 'sendMail']);
             // Route::post('forgot-password', 'AuthController@forgotPassword');
             // Route::post('reset-password', 'AuthController@resetPassword');
             // Route::post('g2f-verify', 'AuthController@g2fVerify');
@@ -83,7 +87,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         Route::group(['namespace' => 'Api\User', 'middleware' => ['auth:sanctum', 'api-user', 'generateSecret', 'last_seen']], function () {
         //     // profile
 
-        //     Route::get('notifications', 'ProfileController@userNotification');
+            Route::get('notifications', [ProfileController::class, 'userNotification']);
         //     Route::post('notification-seen', 'ProfileController@userNotificationSeen');
         //     Route::get('activity-list', 'ProfileController@activityList');
         //     Route::post('update-profile', 'ProfileController@updateProfile');
@@ -110,6 +114,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
 
             Route::group(['middleware' => 'check_demo'], function () {
                 Route::post('google2fa-setup', [ProfileController::class, 'google2faSetup']);
+                Route::post('update-preferred-currency', [ProfileController::class, 'updatePreferredCurrency']);
         //         Route::get('setup-google2fa-login', 'ProfileController@setupGoogle2faLogin');
 
         //         Route::post('profile-delete-request', 'ProfileController@profileDeleteRequest');
@@ -148,9 +153,12 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::post('verification-paystack-payment', 'PaystackPaymentController@verificationPaystackPayment');
 
         //     // User Bank
-        //     Route::get('user-bank-list', 'UserBankController@UserbankGet')->name("UserbankGet");
-        //     Route::post('user-bank-save', 'UserBankController@UserBankSave')->name("UserBankSave");
-        //     Route::post('user-bank-delete', 'UserBankController@UserBankDelete')->name("UserBankDelete");
+            Route::get('user-bank-list', [UserBankController::class, 'UserbankGet'])->name("UserbankGet");
+            Route::post('user-bank-save', [UserBankController::class, 'UserBankSave'])->name("UserBankSave");
+            Route::post('user-bank-delete', [UserBankController::class, 'UserBankDelete'])->name("UserBankDelete");
+            Route::get('user-card-list', [UserCardController::class, 'UserCardGet'])->name("UserCardGet");
+            Route::post('user-card-save', [UserCardController::class, 'UserCardSave'])->name("UserCardSave");
+            Route::post('user-card-delete', [UserCardController::class, 'UserCardDelete'])->name("UserCardDelete");
 
         //     // staking
         //     Route::group(['group' => 'staking', 'prefix' => 'staking', 'middleware' => 'staking'], function () {
