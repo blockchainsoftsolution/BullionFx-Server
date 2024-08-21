@@ -30,7 +30,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'admin', 'middleware' => ['aut
     // require base_path('routes/link/walletManagement.php');
 
     // // general settings
-    // require base_path('routes/link/generalSettings.php');
+    require base_path('routes/link/generalSettings.php');
 
     // // landing settings
     // require base_path('routes/link/landingManagement.php');

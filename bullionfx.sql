@@ -145,8 +145,8 @@ CREATE TABLE `admin_settings`  (
 -- ----------------------------
 INSERT INTO `admin_settings` VALUES (1, 'exchange_url', '', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
 INSERT INTO `admin_settings` VALUES (2, 'coin_price', '2.50', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
-INSERT INTO `admin_settings` VALUES (3, 'coin_name', 'TradexPro', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
-INSERT INTO `admin_settings` VALUES (4, 'app_title', 'TradexPro Admin', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
+INSERT INTO `admin_settings` VALUES (3, 'coin_name', 'BULL', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
+INSERT INTO `admin_settings` VALUES (4, 'app_title', 'Alchemy Admin', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
 INSERT INTO `admin_settings` VALUES (5, 'maximum_withdrawal_daily', '3', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
 INSERT INTO `admin_settings` VALUES (6, 'mail_from', 'noreply@cpoket.com', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
 INSERT INTO `admin_settings` VALUES (7, 'admin_coin_address', 'address', '2022-08-16 09:46:21', '2022-08-16 09:46:21');
@@ -1007,7 +1007,7 @@ CREATE TABLE `faqs`  (
 -- ----------------------------
 -- Records of faqs
 -- ----------------------------
-INSERT INTO `faqs` VALUES (1, 'What is Tradexpro exchange ?', 'Aenean condimentum nibh vel enim sodales scelerisque. Mauris quisn pellentesque odio, in vulputate turpis. Integer condimentum eni lorem pellentesque euismod. Nam rutrum accumsan nisl vulputate.', 1, 1, '2022-08-16 09:46:22', '2022-08-16 09:46:22');
+INSERT INTO `faqs` VALUES (1, 'What is Alchemy Vault ?', 'Aenean condimentum nibh vel enim sodales scelerisque. Mauris quisn pellentesque odio, in vulputate turpis. Integer condimentum eni lorem pellentesque euismod. Nam rutrum accumsan nisl vulputate.', 1, 1, '2022-08-16 09:46:22', '2022-08-16 09:46:22');
 INSERT INTO `faqs` VALUES (2, 'How it works ?', 'Aenean condimentum nibh vel enim sodales scelerisque. Mauris quisn pellentesque odio, in vulputate turpis. Integer condimentum eni lorem pellentesque euismod. Nam rutrum accumsan nisl vulputate.', 1, 1, '2022-08-16 09:46:22', '2022-08-16 09:46:22');
 INSERT INTO `faqs` VALUES (3, 'What is the workflow ?', 'Aenean condimentum nibh vel enim sodales scelerisque. Mauris quisn pellentesque odio, in vulputate turpis. Integer condimentum eni lorem pellentesque euismod. Nam rutrum accumsan nisl vulputate.', 1, 1, '2022-08-16 09:46:22', '2022-08-16 09:46:22');
 INSERT INTO `faqs` VALUES (4, 'How i place a order ?', 'Aenean condimentum nibh vel enim sodales scelerisque. Mauris quisn pellentesque odio, in vulputate turpis. Integer condimentum eni lorem pellentesque euismod. Nam rutrum accumsan nisl vulputate.', 1, 1, '2022-08-16 09:46:22', '2022-08-16 09:46:22');
@@ -2871,10 +2871,10 @@ delimiter ;
 DROP TRIGGER IF EXISTS `update_transaction_last_price`;
 delimiter ;;
 CREATE TRIGGER `update_transaction_last_price` BEFORE INSERT ON `transactions` FOR EACH ROW BEGIN
-              SET NEW.last_price = (select price from transactions 
-              where 
-                base_coin_id = NEW.base_coin_id 
-                  and 
+              SET NEW.last_price = (select price from transactions
+              where
+                base_coin_id = NEW.base_coin_id
+                  and
                 trade_coin_id = NEW.trade_coin_id
                 order by created_at desc limit 1 );
             END

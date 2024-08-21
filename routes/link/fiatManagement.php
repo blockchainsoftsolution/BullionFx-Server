@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 // currency list
 Route::group(['group' => 'currency_list'], function () {
-    Route::get('currency-list', 'CurrencyController@adminCurrencyList')->name('adminCurrencyList');
     Route::get('currency-add', 'CurrencyController@adminCurrencyAdd')->name('adminCurrencyAdd');
     Route::get('currency-edit-{id}', 'CurrencyController@adminCurrencyEdit')->name('adminCurrencyEdit');
     Route::get('fiat-currency-list', 'CurrencyController@adminFiatCurrencyList')->name('adminFiatCurrencyList');

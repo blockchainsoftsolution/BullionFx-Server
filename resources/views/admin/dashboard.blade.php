@@ -21,7 +21,7 @@
     </div>
 
     <!-- user chart -->
-    <div class="user-chart mt-0">
+    <!-- <div class="user-chart mt-0">
         <div class="row">
             <div class="col-md-6 mb-4 mb-md-0">
                 <div class="card">
@@ -46,9 +46,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- /user chart -->
-    @if (isset($pending_withdrawals[0]))
+    <!-- @if (isset($pending_withdrawals[0]))
         <div class="mt-4">
             <div class="custom-breadcrumb">
                 <div class="row">
@@ -118,7 +118,7 @@
                 </div>
             </div>
         </div>
-    @endif
+    @endif -->
     <!-- /user chart -->
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -140,7 +140,7 @@
         function showModal(withdrawId, withdrawalData, withdrawType, date, sender, receiver) {
 
             let withdrwData = JSON.parse(withdrawalData)
-            
+
 
             let senderUser = sender ? JSON.parse(sender) : null;
             let receiverUser = receiver ? JSON.parse(receiver) : null;

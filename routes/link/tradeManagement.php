@@ -15,7 +15,6 @@ Route::group(['middleware' => 'check_demo','group' => 'coin_pair'], function () 
     Route::post('trade/change-coin-pair-status', 'TradeSettingController@changeCoinPairStatus')->name('changeCoinPairStatus');
     Route::post('trade/change-coin-pair-default-status', 'TradeSettingController@changeCoinPairDefaultStatus')->name('changeCoinPairDefaultStatus');
     Route::post('trade/change-coin-pair-bot-status', 'TradeSettingController@changeCoinPairBotStatus')->name('changeCoinPairBotStatus');
-    Route::post('trade/save-trade-fees-settings', 'TradeSettingController@tradeFeesSettingSave')->name('tradeFeesSettingSave');
     Route::post('trade/remove-trade-limit', 'TradeSettingController@removeTradeLimit')->name('removeTradeLimit');
     Route::post('trade/change-status-future-trade', 'TradeSettingController@changeFutureTradeStatus')->name('changeFutureTradeStatus');
     Route::post('trade/future-coin-pair-setting-update', 'TradeSettingController@coinPairFutureSettingUpdate')->name('coinPairFutureSettingUpdate');

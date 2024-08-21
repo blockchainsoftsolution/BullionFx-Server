@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-4 col-md-6 col-12 mb-4">
+    <!-- <div class="col-xl-4 col-md-6 col-12 mb-4">
         <div class="card status-card status-card-bg-average">
             <div class="card-body">
                 <div class="status-card-inner">
@@ -172,5 +172,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>

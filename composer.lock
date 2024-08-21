@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "438f2ecbe4a3fd9fe0eb37b62a6d11c9",
+    "content-hash": "e051052a3a7400170b8edfdfe859c9a2",
     "packages": [
         {
             "name": "anhskohbo/no-captcha",
@@ -4394,6 +4394,56 @@
                 }
             ],
             "time": "2024-04-27T21:32:50+00:00"
+        },
+        {
+            "name": "sdtech/bitgo-laravel",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/syedbacchu/bitgo-laravel.git",
+                "reference": "34a3563fe091cf6f6fc4c211cc08dcf97e5a290c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/syedbacchu/bitgo-laravel/zipball/34a3563fe091cf6f6fc4c211cc08dcf97e5a290c",
+                "reference": "34a3563fe091cf6f6fc4c211cc08dcf97e5a290c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sdtech\\BitgoApiLaravel\\Providers\\BitgoWalletApiServiceProviders"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Service/BitgoApiLaravelService.php"
+                ],
+                "psr-4": {
+                    "Sdtech\\BitgoApiLaravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "sd bacchu",
+                    "email": "bacchu.cse11@gmail.com"
+                }
+            ],
+            "description": "It's a simple library to integrate bitgo wallet api",
+            "support": {
+                "issues": "https://github.com/syedbacchu/bitgo-laravel/issues",
+                "source": "https://github.com/syedbacchu/bitgo-laravel/tree/v1.1.0"
+            },
+            "time": "2024-06-14T06:02:47+00:00"
         },
         {
             "name": "sendgrid/php-http-client",

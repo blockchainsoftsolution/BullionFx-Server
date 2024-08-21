@@ -29,15 +29,11 @@
     ['route' => 'adminRoleList', 'title' => __('Role'),'tab' => $sub_menu ?? '', 'tab_compare' => 'admin_role_list', 'route_param' => NULL ],
 ]) !!}
 
-{{-- {!! subMenuRenderer(__('User Wallet'),$menu ?? '', 'wallet','wallet.svg',[
-    ['route' => 'adminWalletList', 'title' => __('Wallet List'),'tab' => $sub_menu ?? '', 'tab_compare' => 'wallet_list', 'route_param' => NULL ],
+{!! subMenuRenderer(__('User Wallet'),$menu ?? '', 'wallet','wallet.svg',[
     ['route' => 'walletAddressList', 'title' => __('Wallet Address List'),'tab' => $sub_menu ?? '', 'tab_compare' => 'wallet_address_list', 'route_param' => NULL ],
-    ['route' => 'adminSendWallet', 'title' => __('Send Wallet Coin'),'tab' => $sub_menu ?? '', 'tab_compare' => 'send_wallet', 'route_param' => NULL ],
-    ['route' => 'adminWalletSendList', 'title' => __('Send Coin History'),'tab' => $sub_menu ?? '', 'tab_compare' => 'send_coin_list', 'route_param' => NULL ],
-    ['route' => 'adminSwapCoinHistory', 'title' => __('Swap Coin History'),'tab' => $sub_menu ?? '', 'tab_compare' => 'swap_coin_history', 'route_param' => NULL ],
 ]) !!}
 
-{!! subMenuRenderer(__('Deposit/Withdrawal'),$menu ?? '', 'transaction','Transaction-1.svg',[
+{{-- {!! subMenuRenderer(__('Deposit/Withdrawal'),$menu ?? '', 'transaction','Transaction-1.svg',[
     ['route' => 'adminTransactionHistory', 'title' => __('Crypto Transaction'),'tab' => $sub_menu ?? '', 'tab_compare' => 'transaction_all', 'route_param' => NULL ],
     ['route' => 'adminPendingDeposit', 'title' => __('Pending Crypto Deposit'),'tab' => $sub_menu ?? '', 'tab_compare' => 'transaction_deposit', 'route_param' => NULL ],
     ['route' => 'adminPendingWithdrawal', 'title' => __('Pending Crypto Withdrawal'),'tab' => $sub_menu ?? '', 'tab_compare' => 'transaction_withdrawal', 'route_param' => NULL ],
@@ -91,8 +87,8 @@
 
 @if(settings('enable_gift_card') ?? 0)
 {!! mainMenuRenderer('giftCardDashboard',__('Gift Card'),$menu ?? '','gift_card','staking.svg') !!}
-@endif
-{!! subMenuRenderer(__('Settings'),$menu ?? '', 'setting','settings.svg',[
+@endif --}}
+{{-- {!! subMenuRenderer(__('Settings'),$menu ?? '', 'setting','settings.svg',[
     ['route' => 'adminSettings', 'title' => __('General'),'tab' => $sub_menu ?? '', 'tab_compare' => 'general', 'route_param' => NULL ],
     ['route' => 'adminFeatureSettings', 'title' => __('Features'),'tab' => $sub_menu ?? '', 'tab_compare' => 'feature_settings', 'route_param' => NULL ],
     ['route' => 'themesSettingsPage', 'title' => __('Theme Setting'),'tab' => $sub_menu ?? '', 'tab_compare' => 'theme_setting', 'route_param' => NULL ],

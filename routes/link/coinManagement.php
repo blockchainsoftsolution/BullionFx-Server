@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\admin\WalletController;
 
 Route::group(['group' => 'coin_list'], function () {
     Route::get('total-user-coin', 'CoinController@adminUserCoinList')->name('adminUserCoinList');
@@ -30,22 +31,22 @@ Route::group(['group' => 'coin_list'], function () {
 
 // Wallet management
 Route::group(['group' => 'wallet_list'], function () {
-    Route::get('wallet-list', 'WalletController@adminWalletList')->name('adminWalletList');
+    Route::get('wallet-list', [WalletController::class, 'adminWalletList'])->name('adminWalletList');
     Route::get('my-wallet-list', 'WalletController@myWalletList')->name('myWalletList');
-    Route::get('wallet-address-list', 'WalletController@walletAddressList')->name('walletAddressList');
+    Route::get('wallet-address-list', [WalletController::class, 'walletAddressList'])->name('walletAddressList');
     Route::get('deduct-wallet-balance-{wallet_id}', 'WalletController@deductWalletBalance')->name('deductWalletBalance');
     Route::post('update-deduct-wallet-balance', 'WalletController@deductWalletBalanceSave')->name('deductWalletBalanceSave');
     Route::get('wallet-list-export', 'WalletController@adminWalletListExport')->name('adminWalletListExport');
 });
 Route::group(['group' => 'send_wallet'], function () {
-    Route::get('send-wallet-balance', 'WalletController@adminSendWallet')->name('adminSendWallet');
+    Route::get('send-wallet-balance', [WalletController::class, 'adminSendWallet'])->name('adminSendWallet');
     Route::get('active-user-list', 'WalletController@adminActiveUserList')->name('adminActiveUserList');
 });
 Route::group(['group' => 'send_wallet'], function () {
-    Route::get('send-coin-list', 'WalletController@adminWalletSendList')->name('adminWalletSendList');
+    Route::get('send-coin-list', [WalletController::class, 'adminWalletSendList'])->name('adminWalletSendList');
 });
 Route::group(['group' => 'swap_coin_history'], function () {
-    Route::get('swap-coin-history', 'WalletController@adminSwapCoinHistory')->name('adminSwapCoinHistory');
+    Route::get('swap-coin-history', [WalletController::class, 'adminSwapCoinHistory'])->name('adminSwapCoinHistory');
 });
 
 Route::group(['middleware' => 'check_demo', 'group' => 'send_wallet'], function () {
