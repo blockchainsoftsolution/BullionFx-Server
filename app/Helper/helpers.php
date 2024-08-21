@@ -977,7 +977,6 @@ function getActionHtml($list_type, $user_id, $item)
     $html = '<div class="activity-icon"><ul>';
     if ($list_type == 'active_users') {
         $html .= '
-               <li><a title="' . __('Api Setting') . '" href="' . route('admin.user.api.access', encrypt($user_id)) . '" class="user-two btn btn-success btn-sm"><span><i class="fa fa-cog pr-1"></i>' . __(' Api Setting') . '</span></a></li>
                <li><a title="' . __('View') . '" href="' . route('adminUserProfile') . '?id=' . encrypt($user_id) . '&type=view" class="user-two btn btn-info btn-sm"><span><i class="fa fa-eye pr-1"></i>' . __(' View') . '</span></a></li>
                <li><a title="' . __('Edit') . '" href="' . route('admin.UserEdit') . '?id=' . encrypt($user_id) . '&type=edit" class="user-two btn btn-primary btn-sm"><span><i class="fa fa-edit pr-1"></i>' . __(' Edit') . '</span></a></li>
                ' . suspend_html('admin.user.suspend', encrypt($user_id));

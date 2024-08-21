@@ -53,14 +53,14 @@
                         <span>{{ __('Deleted User') }}</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a data-id="delete_request" class="nav-link" id="pills-deleted-user-tab" data-toggle="pill"
                         href="#pills-user" role="tab" aria-controls="pills-deleted-user" aria-selected="true">
                         <img src="{{ asset('assets/admin/images/user-management-icons/delete-user.svg') }}"
                             class="img-fluid" alt="">
                         <span>{{ __('Delete Request') }}</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a data-id="email_pending" class="nav-link" id="pills-email-tab" data-toggle="pill"
                         href="#pills-user" role="tab" aria-controls="pills-email" aria-selected="true">
@@ -69,14 +69,14 @@
                         {{ __('Email Pending') }}
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a data-id="phone_pending" class="nav-link" id="pills-email-tab" data-toggle="pill"
                         href="#pills-user" role="tab" aria-controls="pills-email" aria-selected="true">
                         <img src="{{ asset('assets/admin/images/user-management-icons/email.svg') }}" class="img-fluid"
                             alt="">
                         {{ __('Pending Phone Verify') }}
                     </a>
-                </li>
+                </li> -->
             </ul>
         </div>
         <div class="col-12 col-lg-9">
