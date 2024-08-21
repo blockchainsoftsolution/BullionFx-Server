@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\TradingBotController;
+use App\Http\Controllers\api\user\ProfileController;
 
 Route::group(['prefix' => 'admin', 'namespace' => 'admin', 'middleware' => ['auth', 'admin', 'default_lang']], function () {
 
@@ -65,16 +66,16 @@ Route::group(['prefix' => 'admin', 'namespace' => 'admin', 'middleware' => ['aut
 
 });
 
-// Route::group(['middleware' => ['auth', 'lang']], function () {
+Route::group(['middleware' => ['auth', 'lang']], function () {
 //     Route::get('/send-sms-for-verification', 'user\ProfileController@sendSMS')->name('sendSMS');
 //     Route::get('test', 'TestController@index')->name('test');
 //     Route::group(['middleware' => 'check_demo'], function () {
 //         Route::post('/user-profile-update', 'user\ProfileController@userProfileUpdate')->name('userProfileUpdate');
 //         Route::post('/upload-profile-image', 'user\ProfileController@uploadProfileImage')->name('uploadProfileImage');
-//         Route::post('change-password-save', 'user\ProfileController@changePasswordSave')->name('changePasswordSave');
+        Route::post('change-password-save', [ProfileController::class, 'changePasswordSave'])->name('changePasswordSave');
 //         Route::post('/phone-verify', 'user\ProfileController@phoneVerify')->name('phoneVerify');
 //     });
-// });
+});
 
 // Route::get('/invocie', function () {
 //     return view('email.template-three.index');

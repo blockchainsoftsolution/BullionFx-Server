@@ -130,7 +130,7 @@ class DashboardController extends Controller
         $two_factor_list = $default['two_factor_list'] ?? '{}';
         $data['two_factor'] = json_decode($two_factor_list, true);
         $google2fa = new Google2FA();
-        $google2fa->setAllowInsecureCallToGoogleApis(true);
+        // $google2fa->setAllowInsecureCallToGoogleApis(true);
         $data['google2fa_secret'] = $google2fa->generateSecretKey();
         $user = Auth::user();
         // $google2fa_url = $google2fa->getQRCodeGoogleUrl(
