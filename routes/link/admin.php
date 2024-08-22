@@ -27,7 +27,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'admin', 'middleware' => ['aut
     require base_path('routes/link/coinManagement.php');
 
     // // wallet deposit withdrawal management
-    // require base_path('routes/link/walletManagement.php');
+    require base_path('routes/link/walletManagement.php');
 
     // // general settings
     require base_path('routes/link/generalSettings.php');

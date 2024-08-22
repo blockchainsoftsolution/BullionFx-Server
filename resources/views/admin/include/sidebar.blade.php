@@ -33,7 +33,7 @@
     ['route' => 'walletAddressList', 'title' => __('Wallet Address List'),'tab' => $sub_menu ?? '', 'tab_compare' => 'wallet_address_list', 'route_param' => NULL ],
 ]) !!}
 
-{{-- {!! subMenuRenderer(__('Deposit/Withdrawal'),$menu ?? '', 'transaction','Transaction-1.svg',[
+{!! subMenuRenderer(__('Deposit/Withdrawal'),$menu ?? '', 'transaction','Transaction-1.svg',[
     ['route' => 'adminTransactionHistory', 'title' => __('Crypto Transaction'),'tab' => $sub_menu ?? '', 'tab_compare' => 'transaction_all', 'route_param' => NULL ],
     ['route' => 'adminPendingDeposit', 'title' => __('Pending Crypto Deposit'),'tab' => $sub_menu ?? '', 'tab_compare' => 'transaction_deposit', 'route_param' => NULL ],
     ['route' => 'adminPendingWithdrawal', 'title' => __('Pending Crypto Withdrawal'),'tab' => $sub_menu ?? '', 'tab_compare' => 'transaction_withdrawal', 'route_param' => NULL ],
@@ -44,7 +44,9 @@
     ['route' => 'adminWithdrawalReferralHistory', 'title' => __('Referral Historry'),'tab' => $sub_menu ?? '', 'tab_compare' => 'withdrawal_referral', 'route_param' => NULL ],
 ]) !!}
 
-{!! subMenuRendererAddon(__('Addons'),$menu ?? '', 'addons','addon.svg',[
+{!! mainMenuRenderer('adminFaqList',__('FAQs'),$menu ?? '','faq','FAQ.svg') !!} --}}
+
+{{-- {!! subMenuRendererAddon(__('Addons'),$menu ?? '', 'addons','addon.svg',[
     ['route' => 'addonsLists', 'title' => __('Addons Lists'),'tab' => $sub_menu ?? '', 'tab_compare' => 'addons_list', 'route_param' => NULL ],
     ['route' => 'addonsSettings', 'title' => __('Addons Settings'),'tab' => $sub_menu ?? '', 'tab_compare' => 'addons_settings', 'route_param' => NULL ],
 ]) !!} --}}
@@ -119,8 +121,6 @@
     ['route' => 'sendNotification', 'title' => __('Notification'),'tab' => $sub_menu ?? '', 'tab_compare' => 'notify', 'route_param' => NULL ],
     ['route' => 'sendEmail', 'title' => __('Bulk Email'),'tab' => $sub_menu ?? '', 'tab_compare' => 'email', 'route_param' => NULL ],
 ]) !!}
-
-{!! mainMenuRenderer('adminFaqList',__('FAQs'),$menu ?? '','faq','FAQ.svg') !!} --}}
 
 {{--{!! subMenuRenderer(__('Progress Status'),$menu ?? '', 'progress-status','progress-status.svg',[
     ['route' => 'progressStatusList', 'title' => __('Progress Status List'),'tab' => $sub_menu ?? '', 'tab_compare' => 'progress-status-list', 'route_param' => NULL ],
