@@ -1233,4 +1233,27 @@ class UserService
             return responseData(false);
         }
     }
+
+    // update yield program registration status
+    public function updateYieldStatus($request)
+    {
+        try {
+            $user = Auth::user();
+            $user->update(['earn' => $request->earn]);
+            $response = [
+                'success' => true,
+                'data' => '',
+                'message' => __('Registered successfully')
+            ];
+        } catch (\Exception $e) {
+            storeException('updateYieldStatus', $e->getMessage());
+            $response = [
+                'success' => false,
+                'data' => '',
+                'message' => __('Something went wrong')
+            ];
+        }
+
+        return $response;
+    }
 }

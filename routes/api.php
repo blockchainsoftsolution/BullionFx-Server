@@ -92,25 +92,26 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::get('activity-list', 'ProfileController@activityList');
         //     Route::post('update-profile', 'ProfileController@updateProfile');
             Route::post('change-password', [ProfileController::class, 'changePassword']);
-        //     Route::post('generate-secret-key', 'ProfileController@generateSecretKey');
-        //     Route::post('show-secret-key', 'ProfileController@showSecretKey');
+        //     Route::post('generate-secret-key', [ProfileController::class, 'generateSecretKey']);
+        //     Route::post('show-secret-key', [ProfileController::class, 'showSecretKey']);
 
         //     // kyc
-        //     Route::post('send-phone-verification-sms', 'ProfileController@sendPhoneVerificationSms');
-        //     Route::post('phone-verify', 'ProfileController@phoneVerifyProcess');
-        //     Route::post('upload-nid', 'ProfileController@uploadNid');
-        //     Route::post('upload-passport', 'ProfileController@uploadPassport');
-        //     Route::post('upload-driving-licence', 'ProfileController@uploadDrivingLicence');
-        //     Route::post('upload-voter-card', 'ProfileController@uploadVoterCard');
-            Route::post('kyc-verify', 'ProfileController@banxaKycVerify');
-        //     Route::get('kyc-details', 'ProfileController@kycDetails');
-        //     Route::get('user-setting', 'ProfileController@userSetting');
-        //     Route::get('language-list', 'ProfileController@languageList');
-        //     Route::post('language-setup', 'ProfileController@languageSetup');
-        //     Route::post('update-currency', 'ProfileController@updateFiatCurrency');
+        //     Route::post('send-phone-verification-sms', [ProfileController::class, 'sendPhoneVerificationSms']);
+        //     Route::post('phone-verify', [ProfileController::class, 'phoneVerifyProcess']);
+        //     Route::post('upload-nid', [ProfileController::class, 'uploadNid']);
+        //     Route::post('upload-passport', [ProfileController::class, 'uploadPassport']);
+        //     Route::post('upload-driving-licence', [ProfileController::class, 'uploadDrivingLicence']);
+        //     Route::post('upload-voter-card', [ProfileController::class, 'uploadVoterCard']);
+            Route::post('kyc-verify', [ProfileController::class, 'banxaKycVerify']);
+            Route::post('update-yield-status', [ProfileController::class, 'updateYieldStatus']);
+        //     Route::get('kyc-details', [ProfileController::class, 'kycDetails']);
+        //     Route::get('user-setting', [ProfileController::class, 'userSetting']);
+        //     Route::get('language-list', [ProfileController::class, 'languageList']);
+        //     Route::post('language-setup', [ProfileController::class, 'languageSetup']);
+        //     Route::post('update-currency', [ProfileController::class, 'updateFiatCurrency']);
         //     Route::get('kyc-active-list', 'KycController@kycActiveList');
-        //     Route::get('user-kyc-settings-details', 'ProfileController@userKycSettingsDetails')->name('userKycSettingsDetails');
-        //     Route::post('third-party-kyc-verified', 'ProfileController@thirdPartyKycVerified')->name('thirdPartyKycVerified');
+        //     Route::get('user-kyc-settings-details', [ProfileController::class, 'userKycSettingsDetails'])->name('userKycSettingsDetails');
+        //     Route::post('third-party-kyc-verified', [ProfileController::class, 'thirdPartyKycVerified'])->name('thirdPartyKycVerified');
 
             Route::group(['middleware' => 'check_demo'], function () {
                 Route::post('google2fa-setup', [ProfileController::class, 'google2faSetup']);

@@ -39,6 +39,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('device_type')->default(1);
             $table->tinyInteger('push_notification_status')->default(1);
             $table->tinyInteger('email_notification_status')->default(1);
+            $table->tinyInteger('earn')->default(0)->comment("0 = not registered to yield program, 1 = registered");
             $table->rememberToken();
             $table->timestamps();
         });

@@ -498,4 +498,20 @@ class ProfileController extends Controller
         }
         return response()->json($response);
     }
+
+    // update yield program registration status
+    public function updateYieldStatus($request)
+    {
+        try {
+            $response = $this->service->updateYieldStatus($request);
+            if ($response['success'] == true) {
+                $response = ['success' => true,'message' => $response['message'], 'data' => []];
+            } else {
+                $response = ['success' => false,'message' => $response['message'], 'data' => []];
+            }
+        } catch (\Exception $e) {
+            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+        }
+        return response()->json($response);
+    }
 }
