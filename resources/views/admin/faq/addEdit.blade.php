@@ -70,10 +70,10 @@
                                 <div class="form-group">
                                     <label>{{ __('Answer') }}</label>
                                     <textarea class="form-control textarea" name="answer">
-@if (isset($item))
-{{ $item->answer }}@else{{ old('answer') }}
-@endif
-</textarea>
+                                        @if (isset($item))
+                                            {{ $item->answer }}@else{{ old('answer') }}
+                                        @endif
+                                    </textarea>
                                 </div>
                             </div>
                             <div class="col-12">

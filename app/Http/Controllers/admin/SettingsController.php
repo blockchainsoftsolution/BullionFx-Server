@@ -508,7 +508,6 @@ class SettingsController extends Controller
     // View Add new faq page
     public function adminFaqAdd(){
         $data['title']=__('Add FAQs');
-        $data['faq_type_list'] = $this->faqTypeService->getFaqTypeActiveList()['data'];
         return view('admin.faq.addEdit',$data);
     }
 
@@ -624,7 +623,6 @@ class SettingsController extends Controller
     public function adminFaqEdit($id){
         $data['title']=__('Update FAQs');
         $data['item']=Faq::findOrFail($id);
-        $data['faq_type_list'] = $this->faqTypeService->getFaqTypeActiveList()['data'];
         return view('admin.faq.addEdit',$data);
     }
 
