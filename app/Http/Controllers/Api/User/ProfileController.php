@@ -248,7 +248,23 @@ class ProfileController extends Controller
         try {
             $response = $this->service->setupPreferredCurrency($request);
         } catch (\Exception $e) {
-            storeException('google2faSetup', $e->getMessage());
+            storeException('preferredCurrencySetup', $e->getMessage());
+            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+        }
+        return response()->json($response);
+    }
+
+    /**
+     * user preferred language setup
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePreferredLanguage(Request $request)
+    {
+        try {
+            $response = $this->service->setupPreferredLanguage($request);
+        } catch (\Exception $e) {
+            storeException('preferredLanguageSetup', $e->getMessage());
             $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
@@ -312,7 +328,7 @@ class ProfileController extends Controller
     public function userNotification()
     {
         try {
-            $result = Notification::where(['user_id' => Auth::id(), 'status' => STATUS_PENDING ])->orderBy('id','desc')->get();
+            $result = Notification::where(['user_id' => Auth::id() ])->orderBy('id','desc')->get();
 
             if(function_exists("getNotificationListt"))
             {
@@ -370,10 +386,11 @@ class ProfileController extends Controller
     }
 
     // verify KYC using banxa
-    public function banxaKycVerify($request)
+    public function banxaKYCProcess(Request $request)
     {
-        $response = $this->thirdPartyKYCService->banxaKYCVerification($request);
-        return response()->json($response);
+        $response = $this->thirdPartyKYCService->banxaKYCProcess($request);
+        // return response()->json($response);
+        return $response;
     }
 
     public function userKycSettingsDetails()
@@ -500,17 +517,12 @@ class ProfileController extends Controller
     }
 
     // update yield program registration status
-    public function updateYieldStatus($request)
+    public function updateYieldStatus(Request $request)
     {
         try {
-            $response = $this->service->updateYieldStatus($request);
-            if ($response['success'] == true) {
-                $response = ['success' => true,'message' => $response['message'], 'data' => []];
-            } else {
-                $response = ['success' => false,'message' => $response['message'], 'data' => []];
-            }
+            $response = $this->service->setupYieldStatus($request);
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }

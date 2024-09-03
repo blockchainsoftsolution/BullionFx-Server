@@ -673,7 +673,7 @@ class UserService
         return $response;
     }
 
-    // google 2fa setup process
+    // preferred currency setup process
     public function setupPreferredCurrency($request)
     {
         $response['success'] = false;
@@ -700,6 +700,43 @@ class UserService
             ];
         } catch (\Exception $e) {
             storeException('setupPreferredCurrency', $e->getMessage());
+            $response = [
+                'success' => false,
+                'data' => '',
+                'message' => __('Something went wrong')
+            ];
+        }
+
+        return $response;
+    }
+
+    // preferred language setup process
+    public function setupPreferredLanguage($request)
+    {
+        $response['success'] = false;
+        $response['data'] = '';
+        $response['message'] = __('Invalid Request');
+        try {
+            if (empty($request->language)) {
+                $response = [
+                    'success' => false,
+                    'data' => '',
+                    'message' => __('Language code can not be empty')
+                ];
+                return $response;
+            }
+
+            $user = Auth::user();
+
+            $user->language = $request->language;
+            $user->save();
+            $response = [
+                'success' => true,
+                'data' => $user,
+                'message' => __('Default language updated successfully')
+            ];
+        } catch (\Exception $e) {
+            storeException('setupPreferredLanguage', $e->getMessage());
             $response = [
                 'success' => false,
                 'data' => '',
@@ -1235,14 +1272,26 @@ class UserService
     }
 
     // update yield program registration status
-    public function updateYieldStatus($request)
+    public function setupYieldStatus($request)
     {
+        $response['success'] = false;
+        $response['data'] = '';
+        $response['message'] = __('Invalid Request');
         try {
+            if (empty($request->earn)) {
+                $response = [
+                    'success' => false,
+                    'data' => '',
+                    'message' => __('Request parameter can not be empty')
+                ];
+                return $response;
+            }
             $user = Auth::user();
-            $user->update(['earn' => $request->earn]);
+            $user->earn = $request->earn;
+            $user->save();
             $response = [
                 'success' => true,
-                'data' => '',
+                'data' => $user,
                 'message' => __('Registered successfully')
             ];
         } catch (\Exception $e) {
