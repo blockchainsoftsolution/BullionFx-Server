@@ -1,0 +1,36 @@
+{
+    "name": "phplaravel/php-laravel",
+    "description": "It's a simple laravel project installer with envato product validation ",
+    "type": "library",
+    "license": "MIT",
+    
+    "autoload": {
+        "psr-4": {
+            "Laravel\\PhpLaravel\\": "src/"
+        },
+        "files": [
+            "src/Helpers/functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "itech-theme",
+            "email": "itechtheme01@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Laravel\\PhpLaravel\\Providers\\PhpLaravelServiceProvider"
+            ]
+        }
+    },
+    "prefer-stable": true
+}
