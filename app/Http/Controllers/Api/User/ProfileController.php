@@ -385,12 +385,33 @@ class ProfileController extends Controller
         return response()->json($response);
     }
 
-    // verify KYC using banxa
-    public function banxaKYCProcess(Request $request)
+    public function getSumsubAccessToken()
     {
-        $response = $this->thirdPartyKYCService->banxaKYCProcess($request);
+        // $externalUserId = uniqid();
+        // $externalUserId = 'test1239';
+        // $levelName = "basic-kyc-level";
+        // $response = $this->thirdPartyKYCService->createApplicant($externalUserId, $levelName);
+        // if ($response) {
+        //     $response = $this->thirdPartyKYCService->getAccessToken($externalUserId, $levelName);
+        // }
         // return response()->json($response);
-        return $response;
+
+        $externalUserId = 'test1240';
+        $levelName = "basic-kyc-level";
+        $response = $this->thirdPartyKYCService->getAccessToken($externalUserId, $levelName);
+        return response()->json($response);
+    }
+
+    public function createSumsubApplicant(Request $request) {
+        $externalUserId = 'test1240';
+        $levelName = "basic-kyc-level";
+        $response = $this->thirdPartyKYCService->createApplicant($externalUserId, $levelName);
+        return response()->json($response);
+    }
+
+    public function sumsubWebhookApplicantCreated(Request $request)
+    {
+        echo json_encode($request);
     }
 
     public function userKycSettingsDetails()
