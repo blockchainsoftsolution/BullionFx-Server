@@ -216,9 +216,10 @@ class ThirdPartyKYCService
     //         echo json_encode(['error' => 'Unknown event type']);
     //     }
     // }
-    public function sumsubWebhookApplicantCreated($request, $content)
+    public function sumsubWebhookApplicantCreated($request)
     {
-        Storage::put('file123.jpg', $content);
+        Storage::put('file123.txt', $request);
+        return 'success';
         // $algo = match($request->headers->get('X-Payload-Digest-Alg')) {
         //     'HMAC_SHA1_HEX' => 'sha1',
         //     'HMAC_SHA256_HEX' => 'sha256',
