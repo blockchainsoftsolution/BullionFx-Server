@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Http\Repositories\AffiliateRepository;
 use App\Http\Repositories\AuthRepositories;
+use App\Http\Services\MailService;
 use App\Models\AffiliationCode;
 use App\Models\UserVerificationCode;
 use App\Models\User;
@@ -31,20 +32,20 @@ class AuthService
     {
         $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => (object) []];
         DB::beginTransaction();
-        $parentUserId = 0;
+        // $parentUserId = 0;
         try {
-            if ($request->has('ref_code')) {
-                $parentUser = AffiliationCode::where('code', $request->ref_code)->first();
-                if (!$parentUser) {
-                    return ['success' => false, 'message' => __('Invalid referral code.'), 'data' => (object) []];
-                } else {
-                    $parentUserId = $parentUser->user_id;
-                }
-            }
-            $mail_key = $this->repository->generate_email_verification_key();
+            // if ($request->has('ref_code')) {
+            //     $parentUser = AffiliationCode::where('code', $request->ref_code)->first();
+            //     if (!$parentUser) {
+            //         return ['success' => false, 'message' => __('Invalid referral code.'), 'data' => (object) []];
+            //     } else {
+            //         $parentUserId = $parentUser->user_id;
+            //     }
+            // }
+            // $mail_key = $this->repository->generate_email_verification_key();
             $userData = [
-                'first_name' => $request['first_name'],
-                'last_name' => $request['last_name'],
+                // 'first_name' => $request['first_name'],
+                // 'last_name' => $request['last_name'],
                 'email' => $request['email'],
                 'role' => USER_ROLE_USER,
                 'password' => Hash::make($request['password']),
@@ -52,20 +53,20 @@ class AuthService
 
             $user = $this->repository->create($userData);
             if ($user) {
-                $userVerificationData = [
-                    'user_id' => $user->id,
-                    'code' => $mail_key,
-                    'expired_at' => date('Y-m-d', strtotime('+15 days'))
-                ];
-                $userVerification = $this->repository->createUserVerification($userVerificationData);
-                $wallet = $this->repository->createUserWallet($user->id);
+                // $userVerificationData = [
+                //     'user_id' => $user->id,
+                //     'code' => $mail_key,
+                //     'expired_at' => date('Y-m-d', strtotime('+15 days'))
+                // ];
+                // $userVerification = $this->repository->createUserVerification($userVerificationData);
+                // $wallet = $this->repository->createUserWallet($user->id);
 
-                if ($parentUserId > 0) {
-                    $referralRepository = new AffiliateRepository;
-                    $createdReferral = $referralRepository->createReferralUser($user->id, $parentUserId);
-                }
+                // if ($parentUserId > 0) {
+                //     $referralRepository = new AffiliateRepository;
+                //     $createdReferral = $referralRepository->createReferralUser($user->id, $parentUserId);
+                // }
 
-                $response = $this->sendEmail($user, $mail_key, 'verify');
+                // $response = $this->sendEmail($user, $mail_key, 'verify');
                 DB::commit();
                 // all good
                 $response = ['success' => true, 'message' => __('Sign up successful. Please verify your email'), 'data' => $user];

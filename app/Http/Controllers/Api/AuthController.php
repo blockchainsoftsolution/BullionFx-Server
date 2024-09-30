@@ -119,62 +119,62 @@ class AuthController extends Controller
                         $token = $user->createToken($request->email)->plainTextToken;
                         //Check email verification
                         if ($user->status == STATUS_SUCCESS) {
-                            if (!empty($user->is_verified)) {
-                                $data['success'] = true;
-                                $data['message'] = __('Login successful');
-                                $data['email_verified'] = $user->is_verified;
-                                create_coin_wallet(Auth::id());
-                                if ($user->g2f_enabled == STATUS_ACTIVE) {
-                                    $data['g2f_enabled'] = $user->g2f_enabled;
-                                    $data['message'] = __('Please verify two factor authentication to get access ');
-                                }
-                                if ($user->email_enabled == STATUS_ACTIVE) {
-                                    $data['email_enabled'] = $user->email_enabled;
-                                    $data['message'] = __('Please verify two factor authentication to get access ');
-                                }
-                                if ($user->phone_enabled == STATUS_ACTIVE) {
-                                    $data['phone_enabled'] = $user->phone_enabled;
-                                    $data['message'] = __('Please verify two factor authentication to get access ');
-                                }
-                                if ($user->g2f_enabled == STATUS_DEACTIVE && $user->email_enabled == STATUS_DEACTIVE && $user->phone_enabled == STATUS_DEACTIVE) {
-                                    $data['token'] = $token;
-                                    $data['access_type'] = 'Bearer';
-                                }
-
-                                $data['user'] = $user;
-                                $data['user']->photo = show_image_path($user->photo, IMG_USER_PATH);
-                                createUserActivity(Auth::user()->id, USER_ACTIVITY_LOGIN);
-
-                                return response()->json($data);
-                            } else {
-                                $existsToken = User::join('user_verification_codes', 'user_verification_codes.user_id', 'users.id')
-                                    ->where('user_verification_codes.user_id', $user->id)
-                                    ->whereDate('user_verification_codes.expired_at', '>=', Carbon::now()->format('Y-m-d'))
-                                    ->first();
-                                if (!empty($existsToken)) {
-                                    $mail_key = $existsToken->code;
-                                } else {
-                                    $mail_key = randomNumber(6);
-                                    UserVerificationCode::create(['user_id' => $user->id, 'code' => $mail_key, 'status' => STATUS_PENDING, 'expired_at' => date('Y-m-d', strtotime('+15 days'))]);
-                                }
-                                try {
-                                    $data['email_verified'] = $user->is_verified;
-                                    $this->service->sendEmail($user, $mail_key, 'verify');
-
-                                    $data['success'] = false;
-                                    $data['message'] = __('Your email is not verified yet. Please verify your mail.');
-                                    Auth::logout();
-
-                                    return response()->json($data, 401);
-                                } catch (\Exception $e) {
-                                    $data['email_verified'] = $user->is_verified;
-                                    $data['success'] = false;
-                                    $data['message'] = $e->getMessage();
-                                    Auth::logout();
-
-                                    return response()->json($data, 500);
-                                }
+                            // if (!empty($user->is_verified)) {
+                            $data['success'] = true;
+                            $data['message'] = __('Login successful');
+                            $data['email_verified'] = $user->is_verified;
+                            create_coin_wallet(Auth::id());
+                            if ($user->g2f_enabled == STATUS_ACTIVE) {
+                                $data['g2f_enabled'] = $user->g2f_enabled;
+                                $data['message'] = __('Please verify two factor authentication to get access ');
                             }
+                            if ($user->email_enabled == STATUS_ACTIVE) {
+                                $data['email_enabled'] = $user->email_enabled;
+                                $data['message'] = __('Please verify two factor authentication to get access ');
+                            }
+                            if ($user->phone_enabled == STATUS_ACTIVE) {
+                                $data['phone_enabled'] = $user->phone_enabled;
+                                $data['message'] = __('Please verify two factor authentication to get access ');
+                            }
+                            if ($user->g2f_enabled == STATUS_DEACTIVE && $user->email_enabled == STATUS_DEACTIVE && $user->phone_enabled == STATUS_DEACTIVE) {
+                                $data['token'] = $token;
+                                $data['access_type'] = 'Bearer';
+                            }
+
+                            $data['user'] = $user;
+                            $data['user']->photo = show_image_path($user->photo, IMG_USER_PATH);
+                            createUserActivity(Auth::user()->id, USER_ACTIVITY_LOGIN);
+
+                            return response()->json($data);
+                            // } else {
+                            //     $existsToken = User::join('user_verification_codes', 'user_verification_codes.user_id', 'users.id')
+                            //         ->where('user_verification_codes.user_id', $user->id)
+                            //         ->whereDate('user_verification_codes.expired_at', '>=', Carbon::now()->format('Y-m-d'))
+                            //         ->first();
+                            //     if (!empty($existsToken)) {
+                            //         $mail_key = $existsToken->code;
+                            //     } else {
+                            //         $mail_key = randomNumber(6);
+                            //         UserVerificationCode::create(['user_id' => $user->id, 'code' => $mail_key, 'status' => STATUS_PENDING, 'expired_at' => date('Y-m-d', strtotime('+15 days'))]);
+                            //     }
+                            //     try {
+                            //         $data['email_verified'] = $user->is_verified;
+                            //         $this->service->sendEmail($user, $mail_key, 'verify');
+
+                            //         $data['success'] = false;
+                            //         $data['message'] = __('Your email is not verified yet. Please verify your mail.');
+                            //         Auth::logout();
+
+                            //         return response()->json($data, 401);
+                            //     } catch (\Exception $e) {
+                            //         $data['email_verified'] = $user->is_verified;
+                            //         $data['success'] = false;
+                            //         $data['message'] = $e->getMessage();
+                            //         Auth::logout();
+
+                            //         return response()->json($data, 500);
+                            //     }
+                            // }
                         } elseif ($user->status == STATUS_SUSPENDED) {
                             $data['email_verified'] = 1;
                             $data['success'] = false;
@@ -216,9 +216,15 @@ class AuthController extends Controller
                     return response()->json($data, 404);
                 }
             } else {
-                $data['success'] = false;
-                $data['message'] = __("You have no account, please register new account");
-                return response()->json($data, 404);
+
+                $result = $this->service->signUpProcess($request);
+                if ($result['success'])
+                    $this->signIn($request);
+                else {
+                    $data['success'] = false;
+                    $data['message'] = __("An error while creating a new account");
+                    return response()->json($data, 500);
+                }
             }
         } catch (\Exception $e) {
             storeException('signIn', $e->getMessage());

@@ -3,7 +3,7 @@ namespace App\Http\Services;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
-use App\Mail\VerifyEmail;
+// use App\Mail\VerifyEmail;
 use App\Models\User;
 
 class MailService
@@ -43,20 +43,20 @@ class MailService
 
     public function send($template = '', $data = [], $to = '', $name = '', $subject = '')
     {
-        $user = User::find(1);
-        try {
-            Mail::to($to)->send(new VerifyEmail($user));
-            // Mail::send($template, $data, function ($message) use ($name, $to, $subject) {
-            //     $message->to($to, $name)->subject($subject)->replyTo(
-            //         $this->defaultEmail,
-            //         $this->defaultName,
-            //     );
-            //     // $message->from($this->defaultEmail, $this->defaultName);
-            // });
-        } catch (\Exception $e) {
-            storeException('mail send problem ', $e->getMessage());
-            return $e->getMessage();
-        }
+        // $user = User::find(1);
+        // try {
+        //     Mail::to($to)->send(new VerifyEmail($user));
+        //     // Mail::send($template, $data, function ($message) use ($name, $to, $subject) {
+        //     //     $message->to($to, $name)->subject($subject)->replyTo(
+        //     //         $this->defaultEmail,
+        //     //         $this->defaultName,
+        //     //     );
+        //     //     // $message->from($this->defaultEmail, $this->defaultName);
+        //     // });
+        // } catch (\Exception $e) {
+        //     storeException('mail send problem ', $e->getMessage());
+        //     return $e->getMessage();
+        // }
     }
 
     public function sendTest($template = '', $data = [], $to = '', $name = '', $subject = '')
