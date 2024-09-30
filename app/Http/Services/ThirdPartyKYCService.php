@@ -216,16 +216,16 @@ class ThirdPartyKYCService
     //         echo json_encode(['error' => 'Unknown event type']);
     //     }
     // }
-    public function sumsubWebhookApplicantCreated($request, $content)
+    public function sumsubWebhookApplicantCreated($request)
     {
-        $algo = match($request->headers->get('X-Payload-Digest-Alg')) {
-            'HMAC_SHA1_HEX' => 'sha1',
-            'HMAC_SHA256_HEX' => 'sha256',
-            'HMAC_SHA512_HEX' => 'sha512',
-            default => throw new RuntimeException('Unsupported algorithm'),
-        };
-        Storage::put('file123.txt', json_encode($algo));
+        Storage::put('file123.txt', json_encode($request));
         return 'success';
+        // $algo = match($request->headers->get('X-Payload-Digest-Alg')) {
+        //     'HMAC_SHA1_HEX' => 'sha1',
+        //     'HMAC_SHA256_HEX' => 'sha256',
+        //     'HMAC_SHA512_HEX' => 'sha512',
+        //     default => throw new RuntimeException('Unsupported algorithm'),
+        // };
 
         // $res = $request->headers->get('X-Signature') === hash_hmac(
         //     $algo,
@@ -238,7 +238,6 @@ class ThirdPartyKYCService
         //     // throw new LogicProfileException('Webhook sumsub sign ' . $content);
         //     return 'failed';
         // } else {
-        //     Storage::put('file123.txt', json_encode($content));
         //     return $res;
         // }
     }

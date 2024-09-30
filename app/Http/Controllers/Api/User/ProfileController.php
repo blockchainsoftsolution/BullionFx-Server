@@ -409,9 +409,9 @@ class ProfileController extends Controller
         return response()->json($response);
     }
 
-    public function sumsubWebhookApplicantCreated($request, $content)
+    public function sumsubWebhookApplicantCreated(Request $request)
     {
-        $response = $this->thirdPartyKYCService->sumsubWebhookApplicantCreated($request, $content);
+        $response = $this->thirdPartyKYCService->sumsubWebhookApplicantCreated($request);
         return response()->json($response);
     }
 
