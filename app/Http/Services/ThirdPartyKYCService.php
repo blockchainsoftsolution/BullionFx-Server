@@ -20,6 +20,7 @@ use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\Exception\GuzzleException;
 use function GuzzleHttp\Psr7\stream_for;
 use RuntimeException;
+use Illuminate\Support\Facades\Storage;
 
 class ThirdPartyKYCService
 {
@@ -159,5 +160,84 @@ class ThirdPartyKYCService
         }
 
         return $json;
+    }
+
+    // Function to verify Sumsub signature
+    // function verify_sumsub_signature($requestBody, $signature, $secretKey) {
+    //     // Create a hash using HMAC with the secret key and SHA256
+    //     $calculatedSignature = base64_encode(hash_hmac('sha256', $requestBody, $secretKey, true));
+
+    //     // Compare the calculated signature with the received one
+    //     return hash_equals($calculatedSignature, $signature);
+    // }
+
+    // public function sumsubWebhookApplicantCreated($request)
+    // {
+    //     $headers = getallheaders();
+    //     $sumsubSignature = isset($headers['X-Signature-SHA256']) ? $headers['X-Signature-SHA256'] : '';
+    //     if (!$this->verify_sumsub_signature($request, $sumsubSignature, $this->secretKey)) {
+    //         // Respond with an error if signature verification fails
+    //         http_response_code(403);
+    //         echo json_encode(['error' => 'Invalid signature']);
+    //         exit;
+    //     }
+
+    //     // Parse the JSON webhook payload
+    //     $data = json_decode($request, true);
+
+    //     if (json_last_error() !== JSON_ERROR_NONE) {
+    //         // Respond with an error if the JSON is invalid
+    //         http_response_code(400);
+    //         echo json_encode(['error' => 'Invalid JSON']);
+    //         exit;
+    //     }
+
+    //     // Handle different webhook event types
+    //     if (isset($data['reviewStatus'])) {
+    //         $applicantId = $data['applicantId'];
+    //         $reviewStatus = $data['reviewStatus'];
+
+    //         // Process based on the review status (example: approve, reject, etc.)
+    //         if ($reviewStatus === 'completed') {
+    //             // Example: Mark the user as verified in your database
+    //             // updateUserVerificationStatus($applicantId, true);
+    //         } elseif ($reviewStatus === 'pending') {
+    //             // Handle pending status
+    //         } elseif ($reviewStatus === 'rejected') {
+    //             // Handle rejection
+    //         }
+
+    //         // Respond with a success status
+    //         http_response_code(200);
+    //         echo json_encode(['message' => 'Webhook handled successfully']);
+    //     } else {
+    //         // Handle unknown events
+    //         http_response_code(400);
+    //         echo json_encode(['error' => 'Unknown event type']);
+    //     }
+    // }
+    public function sumsubWebhookApplicantCreated($request, $content)
+    {
+        Storage::put('file123.jpg', $content);
+        // $algo = match($request->headers->get('X-Payload-Digest-Alg')) {
+        //     'HMAC_SHA1_HEX' => 'sha1',
+        //     'HMAC_SHA256_HEX' => 'sha256',
+        //     'HMAC_SHA512_HEX' => 'sha512',
+        //     default => throw new RuntimeException('Unsupported algorithm'),
+        // };
+
+        // $res = $request->headers->get('X-Signature') === hash_hmac(
+        //     $algo,
+        //     $content,
+        //     $this->secretKey
+        // );
+
+        // if (!$res) {
+        //     // $this->logger->error('Webhook sumsub sign ' . $content);
+        //     // throw new LogicProfileException('Webhook sumsub sign ' . $content);
+        //     return 'failed';
+        // } else {
+        //     return $res;
+        // }
     }
 }
