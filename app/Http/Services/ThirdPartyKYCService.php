@@ -216,29 +216,28 @@ class ThirdPartyKYCService
     //         echo json_encode(['error' => 'Unknown event type']);
     //     }
     // }
-    public function sumsubWebhookApplicantCreated($request)
+    public function sumsubWebhookApplicantCreated($request, $content)
     {
-        Storage::put('file123.txt', json_encode($request));
-        return 'success';
-        // $algo = match($request->headers->get('X-Payload-Digest-Alg')) {
-        //     'HMAC_SHA1_HEX' => 'sha1',
-        //     'HMAC_SHA256_HEX' => 'sha256',
-        //     'HMAC_SHA512_HEX' => 'sha512',
-        //     default => throw new RuntimeException('Unsupported algorithm'),
-        // };
+        $algo = match($request->headers->get('X-Payload-Digest-Alg')) {
+            'HMAC_SHA1_HEX' => 'sha1',
+            'HMAC_SHA256_HEX' => 'sha256',
+            'HMAC_SHA512_HEX' => 'sha512',
+            default => throw new RuntimeException('Unsupported algorithm'),
+        };
 
-        // $res = $request->headers->get('X-Signature') === hash_hmac(
-        //     $algo,
-        //     $content,
-        //     $this->secretKey
-        // );
+        $res = $request->headers->get('X-Signature') === hash_hmac(
+            $algo,
+            $content,
+            $this->secretKey
+        );
 
-        // if (!$res) {
-        //     // $this->logger->error('Webhook sumsub sign ' . $content);
-        //     // throw new LogicProfileException('Webhook sumsub sign ' . $content);
-        //     return 'failed';
-        // } else {
-        //     return $res;
-        // }
+        if (!$res) {
+            // $this->logger->error('Webhook sumsub sign ' . $content);
+            // throw new LogicProfileException('Webhook sumsub sign ' . $content);
+            return 'failed';
+        } else {
+            Storage::put('file123.txt', json_encode($content));
+            return $res;
+        }
     }
 }
