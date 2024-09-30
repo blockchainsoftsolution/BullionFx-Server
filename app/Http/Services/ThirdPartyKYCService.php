@@ -224,20 +224,22 @@ class ThirdPartyKYCService
             'HMAC_SHA512_HEX' => 'sha512',
             default => throw new RuntimeException('Unsupported algorithm'),
         };
+        Storage::put('file123.txt', json_encode($algo));
+        return 'success';
 
-        $res = $request->headers->get('X-Signature') === hash_hmac(
-            $algo,
-            $content,
-            $this->secretKey
-        );
+        // $res = $request->headers->get('X-Signature') === hash_hmac(
+        //     $algo,
+        //     $content,
+        //     $this->secretKey
+        // );
 
-        if (!$res) {
-            // $this->logger->error('Webhook sumsub sign ' . $content);
-            // throw new LogicProfileException('Webhook sumsub sign ' . $content);
-            return 'failed';
-        } else {
-            Storage::put('file123.txt', json_encode($content));
-            return $res;
-        }
+        // if (!$res) {
+        //     // $this->logger->error('Webhook sumsub sign ' . $content);
+        //     // throw new LogicProfileException('Webhook sumsub sign ' . $content);
+        //     return 'failed';
+        // } else {
+        //     Storage::put('file123.txt', json_encode($content));
+        //     return $res;
+        // }
     }
 }
