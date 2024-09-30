@@ -106,7 +106,6 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
             Route::post('kyc-process', [ProfileController::class, 'sumsubKYCProcess']);
             Route::get('get-sumsub-access-token', [ProfileController::class, 'getSumsubAccessToken']);
             Route::post('create-sumsub-applicant', [ProfileController::class, 'createSumsubApplicant']);
-            Route::post('sumsub-webhook-applicantcreated', [ProfileController::class, 'sumsubWebhookApplicantCreated']);
         //     Route::get('kyc-details', [ProfileController::class, 'kycDetails']);
         //     Route::get('user-setting', [ProfileController::class, 'userSetting']);
         //     Route::get('language-list', [ProfileController::class, 'languageList']);
@@ -378,5 +377,6 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::get('get-coin-network', 'TransactionDepositController@getCoinNetwork');
         //     Route::post('check-coin-transaction', 'TransactionDepositController@checkCoinTransaction');
         // });
+        Route::post('sumsub-webhook-applicantcreated', [ProfileController::class, 'sumsubWebhookApplicantCreated']);
     });
 });
