@@ -105,8 +105,11 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
         //     Route::post('upload-voter-card', [ProfileController::class, 'uploadVoterCard']);
             Route::post('kyc-process', [ProfileController::class, 'sumsubKYCProcess']);
             Route::get('get-sumsub-access-token', [ProfileController::class, 'getSumsubAccessToken']);
-            Route::post('create-sumsub-applicant', [ProfileController::class, 'createSumsubApplicant']);
+            Route::post('update-sumsub-applicant-status', [ProfileController::class, 'updateSumsubApplicantStatus']);
+            // Route::post('create-sumsub-applicant', [ProfileController::class, 'createSumsubApplicant']);
             Route::post('sumsub-webhook-applicantcreated', [ProfileController::class, 'sumsubWebhookApplicantCreated']);
+            Route::post('banxa-kyc-process', [ProfileController::class, 'banxaKYCProcess']);
+            Route::post('banxa-create-buy-order', [ProfileController::class, 'banxaCreateBuyOrder']);
         //     Route::get('kyc-details', [ProfileController::class, 'kycDetails']);
         //     Route::get('user-setting', [ProfileController::class, 'userSetting']);
         //     Route::get('language-list', [ProfileController::class, 'languageList']);

@@ -20,6 +20,7 @@ use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\Exception\GuzzleException;
 use function GuzzleHttp\Psr7\stream_for;
 use RuntimeException;
+use Illuminate\Support\Facades\Auth;
 
 class ThirdPartyKYCService
 {
@@ -34,50 +35,24 @@ class ThirdPartyKYCService
         $settings = allsetting(['sumsub_token', 'sumsub_secret']);
         $this->appToken = $settings['sumsub_token'];
         $this->secretKey = $settings['sumsub_secret'];
+
+        $this->subdomain = 'alchemy';
+        $this->sandboxApiKey = 'bullionfx-api';
+        $this->sandboxApiSecret = 'KcrtBkXRO81Iy6Ir4s9k53xPZIaZvHbQ';
+        $this->testMode = true;
+        $this->banxa = Banxa::create($this->subdomain, $this->sandboxApiKey, $this->sandboxApiSecret, $this->testMode);
     }
 
-    public function verifiedPersonaKYC($request)
+    public function verifiedSumsubKYC($userId, $applicant)
     {
-        $user = auth()->user();
-
-        $settings = allsetting(['persona_kyc_api_key', 'persona_kyc_version']);
-        $headers = [
-            'Authorization: Bearer ' . $settings['PERSONA_KYC_API_KEY'],
-            'Persona-Version: ' . $settings['PERSONA_KYC_VERSION'],
-            'accept: application/json',
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://withpersona.com/api/v1/inquiries/' . $request->inquiry_id);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $result = curl_exec($ch);
-        $result = json_decode($result);
-        curl_close($ch);
-
-        if (isset($result->data)) {
-            $status = STATUS_PENDING;
-            if ($result->data->attributes->status == 'completed') {
-                $status = STATUS_SUCCESS;
-            }
-            $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $user->id)->where('kyc_type', KYC_TYPE_PERSONA)->first();
-            if (isset($thirdPartyKYCDetails)) {
-                $thirdPartyKYCDetails->is_verified = $status;
-                $thirdPartyKYCDetails->key = $request->inquiry_id;
-                $thirdPartyKYCDetails->save();
-            } else {
-                $thirdPartyKYCDetails = new ThirdPartyKycDetails;
-                $thirdPartyKYCDetails->user_id = $user->id;
-                $thirdPartyKYCDetails->kyc_type = KYC_TYPE_PERSONA;
-                $thirdPartyKYCDetails->is_verified = $status;
-                $thirdPartyKYCDetails->key = $request->inquiry_id;
-                $thirdPartyKYCDetails->save();
-            }
-            $response = ['success' => true, 'message' => 'Verification ' . $result->data->attributes->status];
-        } else {
-            $response = ['success' => false, 'message' => $result->errors[0]->title];
-        }
-
+        $status = STATUS_PENDING;
+        $thirdPartyKYCDetails = new ThirdPartyKycDetails;
+        $thirdPartyKYCDetails->user_id = $userId;
+        $thirdPartyKYCDetails->applicant_id = $applicant['id'];
+        $thirdPartyKYCDetails->is_verified = $status;
+        $thirdPartyKYCDetails->key = $applicant['key'];
+        $thirdPartyKYCDetails->save();
+        $response = ['success' => true, 'message' => 'Sumsub verification record added.'];
         return $response;
 
     }
@@ -88,16 +63,16 @@ class ThirdPartyKYCService
         return hash_hmac('sha256', $data, $secretKey);
     }
 
-    public function createApplicant($externalUserId, $levelName)
+    public function createApplicant($user, $levelName)
     {
         $requestBody = [
-            'externalUserId' => $externalUserId,
-            "email"=> "john.smith@sumsub.com",
-            "phone"=> "+449112081223",
-            "fixedInfo"=> [
-                "country"=> "GBR",
-                "placeOfBirth"=> "London"
-            ]
+            'externalUserId' => $user->id,
+            "email"=> $user->email,
+            // "phone"=> "+449112081223",
+            // "fixedInfo"=> [
+            //     "country"=> "GBR",
+            //     "placeOfBirth"=> "London"
+            // ]
         ];
 
         $url = '/resources/applicants?' . http_build_query(['levelName' => $levelName]);
@@ -108,13 +83,32 @@ class ThirdPartyKYCService
 
         $response = $this->sendRequest($request);
         $body = $this->parseBody($response);
-        return $body['id'];
+        $response = $this->verifiedSumsubKYC($user->id, $body);
+        return $response;
     }
 
-    public function getAccessToken($externalUserId, $levelName)
+    public function getAccessToken($userId, $levelName)
     {
-        $url = '/resources/accessTokens?' . http_build_query(['userId' => $externalUserId, 'levelName' => $levelName]);
+        $url = '/resources/accessTokens?' . http_build_query(['userId' => $userId, 'levelName' => $levelName]);
         $request = new Request('POST', $url);
+
+        $response = $this->sendRequest($request);
+        return $this->parseBody($response);
+    }
+
+    public function getApplicantStatus($applicantId)
+    {
+        $url = '/resources/applicants/' . urlencode($applicantId) . '/requiredIdDocsStatus';
+        $request = new Request('GET', $url);
+
+        $response = $this->sendRequest($request);
+        return $this->parseBody($response);
+    }
+
+    public function getApplicantInfo($applicantId)
+    {
+        $url = '/resources/applicants/' . urlencode($applicantId) . '/one';
+        $request = new Request('GET', $url);
 
         $response = $this->sendRequest($request);
         return $this->parseBody($response);
@@ -123,7 +117,7 @@ class ThirdPartyKYCService
 
     protected function sendRequest($request)
     {
-        $now = time()+180;
+        $now = time();
         $request = $request->withHeader('X-App-Token', $this->appToken)
             ->withHeader('X-App-Access-Sig', $this->createSignature($request, $now))
             ->withHeader('X-App-Access-Ts', $now);
@@ -159,5 +153,50 @@ class ThirdPartyKYCService
         }
 
         return $json;
+    }
+
+    public function banxaKYCProcess1() {
+        $client = new Client();
+        
+        $response = $client->request('POST', 'https://ALCHEMY.banxa.com/api/identities', [
+          'body' => '{"account_reference":"84","email":"traininggroup1992@gmail.com","identity_sharing":[{"provider":"sumsub","token":"test1234"}]}',
+          'headers' => [
+            'Accept' => 'application/json',
+            'content-type' => 'application/json',
+            'x-api-key' => 'Bearer xxxxxxxxxxxxxxxxxx',
+          ],
+        ]);
+        
+        echo $response->getBody();
+        
+    }
+
+    public function banxaCreateBuyOrder1($request) {
+        $client = new Client();
+
+        $response = $client->request('POST', 'https://api.banxa.com/ALCHEMY/v2/buy', [
+        'body' => '{"crypto":"USDC","fiat":"AUD","fiatAmount":"2000","walletAddress":"0x823A49375832391AC4962e34B309098115107C88","redirectUrl":"https://example.com","email":"traininggroup1992@gmail.com"}',
+        'headers' => [
+            'Accept' => 'application/json',
+            'content-type' => 'application/json',
+            'x-api-key' => 'xxxxxxxxxxxxxxxxxx',
+        ],
+        ]);
+
+        echo $response->getBody();
+    }
+
+    public function banxaKYCProcess($request)
+    {        // // KYC
+        $data = $this->banxa->createIdentity(
+            IdentitySharingCollection::create([
+                IdentitySharingProvider::create('sumsub', '66fc133fa6408070acf81235')
+            ]),
+            CustomerDetail::create('70', '', 'traininggroup1992@gmail.com'),
+            ResidentialAddress::create('', '', '', '', ''),
+            CustomerIdentity::create('', '', ''),
+        );
+        $response = ['success' => true, 'message' => __('KYC data submitted!'), 'data' => $data];
+        return $response;
     }
 }

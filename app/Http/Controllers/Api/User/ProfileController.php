@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Models\User;
 use App\Models\ActivityLog;
 use App\Models\Notification;
+use App\Models\ThirdPartyKycDetails;
 use Illuminate\Http\Request;
 use App\Http\Services\Logger;
 use App\Http\Services\UserService;
@@ -387,23 +389,42 @@ class ProfileController extends Controller
 
     public function getSumsubAccessToken()
     {
-        // $externalUserId = uniqid();
-        // $externalUserId = 'test1239';
-        // $levelName = "basic-kyc-level";
-        // $response = $this->thirdPartyKYCService->createApplicant($externalUserId, $levelName);
-        // if ($response) {
-        //     $response = $this->thirdPartyKYCService->getAccessToken($externalUserId, $levelName);
-        // }
-        // return response()->json($response);
-
-        $externalUserId = 'test1240';
+        $externalUserId = Auth::id();
         $levelName = "basic-kyc-level";
         $response = $this->thirdPartyKYCService->getAccessToken($externalUserId, $levelName);
         return response()->json($response);
     }
 
+    public function updateSumsubApplicantStatus()
+    {
+        $userId = Auth::id();
+        $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $userId)->first();
+        if (!isset($thirdPartyKYCDetails)) {
+            $user = Auth::user();
+            $levelName = "basic-kyc-level";
+            $kycStatus = $this->thirdPartyKYCService->createApplicant($user, $levelName);
+            if ($kycStatus['success'])
+                $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $userId)->first();
+        }
+        // $response = ['success' => false, 'message' => 'Couldn\'t find KYC record'];
+        $applicantStatus = $this->thirdPartyKYCService->getApplicantStatus($thirdPartyKYCDetails->applicant_id);
+        $status = $applicantStatus['IDENTITY']['reviewResult']['reviewAnswer'] == 'GREEN' ? 2 : 1;
+        $thirdPartyKYCDetails->is_verified = $status;
+        $thirdPartyKYCDetails->save();
+
+        if($status == 2) {
+            $applicantInfo = $this->thirdPartyKYCService->getApplicantInfo($thirdPartyKYCDetails->applicant_id);
+            $user = User::find($userId);
+            $user->first_name = $applicantInfo['info']['firstName'];
+            $user->last_name = $applicantInfo['info']['lastName'];
+            $user->save();
+        }
+        $response = ['success' => true, 'message' => 'Successfully updated KYC status'];
+        return response()->json($response);
+    }
+
     public function createSumsubApplicant(Request $request) {
-        $externalUserId = 'test1240';
+        $externalUserId = Auth::id();
         $levelName = "basic-kyc-level";
         $response = $this->thirdPartyKYCService->createApplicant($externalUserId, $levelName);
         return response()->json($response);
@@ -412,6 +433,16 @@ class ProfileController extends Controller
     public function sumsubWebhookApplicantCreated(Request $request)
     {
         echo json_encode($request);
+    }
+
+    public function banxaKYCProcess(Request $request) {
+        $response = $this->thirdPartyKYCService->banxaKYCProcess($request);
+        return response()->json($response);
+    }
+
+    public function banxaCreateBuyOrder(Request $request) {
+        $response = $this->thirdPartyKYCService->banxaCreateBuyOrder($request);
+        return response()->json($response);
     }
 
     public function userKycSettingsDetails()

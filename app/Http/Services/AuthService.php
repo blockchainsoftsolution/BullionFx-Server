@@ -49,6 +49,7 @@ class AuthService
                 'email' => $request['email'],
                 'role' => USER_ROLE_USER,
                 'password' => Hash::make($request['password']),
+                'is_verified' => true
             ];
 
             $user = $this->repository->create($userData);

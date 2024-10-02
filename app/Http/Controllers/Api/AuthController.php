@@ -13,6 +13,7 @@ use App\Http\Services\AuthService;
 use App\Http\Services\Logger;
 use App\Http\Services\MyCommonService;
 use App\Http\Services\User2FAService;
+use App\Http\Services\ThirdPartyKYCService;
 use App\Models\UserVerificationCode;
 use App\Models\User;
 use Carbon\Carbon;
@@ -36,6 +37,7 @@ class AuthController extends Controller
         $this->service = new AuthService;
         $this->myCommonService = new MyCommonService;
         $this->geeTestService = new GeeTestService;
+        $this->thirdPartyKYCService = new ThirdPartyKYCService;
     }
     // sign up api
     public function signUp(SignUpRequest $request)
@@ -216,11 +218,14 @@ class AuthController extends Controller
                     return response()->json($data, 404);
                 }
             } else {
-
                 $result = $this->service->signUpProcess($request);
-                if ($result['success'])
-                    $this->signIn($request);
-                else {
+                if ($result['success']) {
+                    $user = $result['data'];
+                    $levelName = "basic-kyc-level";
+                    $kycStatus = $this->thirdPartyKYCService->createApplicant($user, $levelName);
+                    if ($kycStatus['success']) $response = $this->signIn($request);
+                    return $response;
+                } else {
                     $data['success'] = false;
                     $data['message'] = __("An error while creating a new account");
                     return response()->json($data, 500);
@@ -228,7 +233,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             storeException('signIn', $e->getMessage());
-            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong with signin'), 'data' => []];
             return response()->json($response, 500);
         }
 
