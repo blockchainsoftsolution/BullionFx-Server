@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Models\ThirdPartyKycDetails;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use App\Http\Services\Logger;
 use App\Http\Services\UserService;
@@ -397,30 +398,43 @@ class ProfileController extends Controller
 
     public function updateSumsubApplicantStatus()
     {
-        $userId = Auth::id();
-        $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $userId)->first();
+        $user = Auth::user();
+        $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $user->id)->first();
         if (!isset($thirdPartyKYCDetails)) {
-            $user = Auth::user();
             $levelName = "basic-kyc-level";
             $kycStatus = $this->thirdPartyKYCService->createApplicant($user, $levelName);
             if ($kycStatus['success'])
-                $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $userId)->first();
+                $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $user->id)->first();
         }
         // $response = ['success' => false, 'message' => 'Couldn\'t find KYC record'];
         $applicantStatus = $this->thirdPartyKYCService->getApplicantStatus($thirdPartyKYCDetails->applicant_id);
-        $status = $applicantStatus['IDENTITY']['reviewResult']['reviewAnswer'] == 'GREEN' ? 2 : 1;
-        $thirdPartyKYCDetails->is_verified = $status;
-        $thirdPartyKYCDetails->save();
-
-        if($status == 2) {
-            $applicantInfo = $this->thirdPartyKYCService->getApplicantInfo($thirdPartyKYCDetails->applicant_id);
-            $user = User::find($userId);
-            $user->first_name = $applicantInfo['info']['firstName'];
-            $user->last_name = $applicantInfo['info']['lastName'];
-            $user->save();
+        if ($applicantStatus['IDENTITY'] && count($applicantStatus['IDENTITY']['reviewResult']) > 0) {
+            $status = $applicantStatus['IDENTITY']['reviewResult']['reviewAnswer'] == 'GREEN' ? 2 : 1;
+            $thirdPartyKYCDetails->is_verified = $status;
+            if($status == 2) {
+                // $response = $this->thirdPartyKYCService->banxaKYCProcess($user, $thirdPartyKYCDetails->applicant_id);
+                $response = $this->thirdPartyKYCService->banxaKYCProcess1();
+                if ($response['success']) {
+                    $thirdPartyKYCDetails->banxa_id = $response['data']['account_id'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Something went wrong with Banxa'];
+                    return response()->json($response);
+                }
+                $applicantInfo = $this->thirdPartyKYCService->getApplicantInfo($thirdPartyKYCDetails->applicant_id);
+                $user = User::find($user->id);
+                $user->first_name = $applicantInfo['info']['firstName'];
+                $user->last_name = $applicantInfo['info']['lastName'];
+                $user->save();
+                $response = ['success' => true, 'message' => 'Successfully completed KYC', 'data' => 'success'];
+            } else {
+                $response = ['success' => false, 'message' => 'KYC not verified yet', 'data' => ''];
+            }
+            $thirdPartyKYCDetails->save();
+            return response()->json($response);
+        } else {
+            $response = ['success' => false, 'message' => 'KYC data not submitted yet', 'data' => ''];
+            return response()->json($response);
         }
-        $response = ['success' => true, 'message' => 'Successfully updated KYC status'];
-        return response()->json($response);
     }
 
     public function createSumsubApplicant(Request $request) {
@@ -441,7 +455,20 @@ class ProfileController extends Controller
     }
 
     public function banxaCreateBuyOrder(Request $request) {
-        $response = $this->thirdPartyKYCService->banxaCreateBuyOrder($request);
+        try {
+            $user = Auth::user();
+            $wallet = Wallet::where('user_id', $user->id)->first();
+            $order_detail = $this->thirdPartyKYCService->banxaCreateBuyOrder($user, $request->fiat, $request->crypto, $wallet->address);
+            $response = ['success' => true, 'message' => 'Successfully created a buy order', 'data' => $order_detail];
+        } catch (\Exception $e) {
+            $response = ['success' => false,'message' => __('Something went wrong with creating a buy order'), 'data' => []];
+        }
+        return response()->json($response);
+    }
+
+    public function banxaCreateSellOrder(Request $request) {
+        $userId = Auth::id();
+        $response = $this->thirdPartyKYCService->banxaCreateSellOrder($request);
         return response()->json($response);
     }
 

@@ -32,13 +32,14 @@ class ThirdPartyKYCService
     public function __construct()
     {
         $this->guzzleClient = new Client(['base_uri' => self::BASE_URL]);
-        $settings = allsetting(['sumsub_token', 'sumsub_secret']);
+        $settings = allsetting(['sumsub_token', 'sumsub_secret', 'banxa_api', 'banxa_secret', 'banxa_api_v2']);
         $this->appToken = $settings['sumsub_token'];
         $this->secretKey = $settings['sumsub_secret'];
 
         $this->subdomain = 'alchemy';
-        $this->sandboxApiKey = 'bullionfx-api';
-        $this->sandboxApiSecret = 'KcrtBkXRO81Iy6Ir4s9k53xPZIaZvHbQ';
+        $this->sandboxApiKey = $settings['banxa_api'];
+        $this->sandboxApiSecret = $settings['banxa_secret'];
+        $this->sandboxApiKeyV2 = $settings['banxa_api_v2'];
         $this->testMode = true;
         $this->banxa = Banxa::create($this->subdomain, $this->sandboxApiKey, $this->sandboxApiSecret, $this->testMode);
     }
@@ -155,48 +156,85 @@ class ThirdPartyKYCService
         return $json;
     }
 
-    public function banxaKYCProcess1() {
+    public function banxaAuthenticator($method, $url, $body, $nonce)
+    {
+        $sign = hash_hmac('SHA256', $method . '\n' . $url . '\n' . $nonce . '\n' . $body, $this->sandboxApiSecret);
+        return $this->sandboxApiKey.':'.$sign.':'.$nonce;
+
+    }
+
+    public function banxaKYCProcess() {
         $client = new Client();
-        
-        $response = $client->request('POST', 'https://ALCHEMY.banxa.com/api/identities', [
-          'body' => '{"account_reference":"84","email":"traininggroup1992@gmail.com","identity_sharing":[{"provider":"sumsub","token":"test1234"}]}',
+        $method = 'POST';
+        $url = '/api/identities';
+        $body = '{"account_reference":"70","email":"traininggroup1992@gmail.com","identity_sharing":[{"provider":"sumsub","token":"66fc133fa6408070acf81235"}]}';
+        $nonce = time();
+        $response = $client->request('POST', 'https://ALCHEMY.banxa-sandbox.com' . $url, [
+          'body' => $body,
           'headers' => [
             'Accept' => 'application/json',
             'content-type' => 'application/json',
-            'x-api-key' => 'Bearer xxxxxxxxxxxxxxxxxx',
+            'Authorization' => 'Bearer ' . $this->sandboxApiKey . ':' . $this->banxaAuthenticator($method, $url, $body, $nonce) . $nonce,
           ],
         ]);
         
-        echo $response->getBody();
-        
+        $body = $response->getBody();
+        $data = json_decode($body, true);
+        return $data;
     }
 
-    public function banxaCreateBuyOrder1($request) {
+    public function banxaCreateBuyOrder($user, $fiat, $crypto, $wallet_address) {
         $client = new Client();
+        $response = $client->request('POST', 'https://api.banxa-sandbox.com/ALCHEMY/v2/buy', [
+            'body' => '{"crypto":"' . $crypto .'","fiat":"'. $fiat .'","fiatAmount":"2000","walletAddress":"'. $wallet_address .'","redirectUrl":"https://bullionfx.com","email":"'. $user->email .'","externalCustomerId":"'. $user->id .'"}',
+            'headers' => [
+                'Accept' => 'application/json',
+                'content-type' => 'application/json',
+                'x-api-key' => $this->sandboxApiKeyV2,
+            ],
+        ]);
 
-        $response = $client->request('POST', 'https://api.banxa.com/ALCHEMY/v2/buy', [
-        'body' => '{"crypto":"USDC","fiat":"AUD","fiatAmount":"2000","walletAddress":"0x823A49375832391AC4962e34B309098115107C88","redirectUrl":"https://example.com","email":"traininggroup1992@gmail.com"}',
-        'headers' => [
-            'Accept' => 'application/json',
-            'content-type' => 'application/json',
-            'x-api-key' => 'xxxxxxxxxxxxxxxxxx',
-        ],
+        $body = $response->getBody();
+        $data = json_decode($body, true);
+        return $data;
+    }
+
+    public function banxaCreateSellOrder($user, $fiat, $crypto, $wallet_address) {
+        $client = new Client();
+        $response = $client->request('POST', 'https://api.banxa-sandbox.com/ALCHEMY/v2/buy', [
+            'body' => '{"crypto":' . $crypto .',"fiat":'. $fiat .',"fiatAmount":"2000","walletAddress":'. $wallet_address .',"redirectUrl":"https://bullionfx.com","email":'. $user->email .',"externalCustomerId":'. $user->id .'}',
+            'headers' => [
+                'Accept' => 'application/json',
+                'content-type' => 'application/json',
+                'x-api-key' => $this->sandboxApiKeyV2,
+            ],
         ]);
 
         echo $response->getBody();
     }
 
-    public function banxaKYCProcess($request)
+    public function banxaKYCProcess1()
     {        // // KYC
-        $data = $this->banxa->createIdentity(
+        // $data = $this->banxa->createIdentity(
+        //     IdentitySharingCollection::create([
+        //         IdentitySharingProvider::create('sumsub', '66fc133fa6408070acf81235')
+        //     ]),
+        //     CustomerDetail::create('70', '', 'traininggroup1992@gmail.com'),
+        //     ResidentialAddress::create('', '', '', '', ''),
+        //     CustomerIdentity::create('', '', ''),
+        // );
+        // $response = ['success' => true, 'message' => __('KYC data submitted!'), 'data' => $data];
+        // return $response;
+        $response = $data = $this->banxa->createIdentity(
             IdentitySharingCollection::create([
-                IdentitySharingProvider::create('sumsub', '66fc133fa6408070acf81235')
+                IdentitySharingProvider::create('sumsub', 'bar')
             ]),
-            CustomerDetail::create('70', '', 'traininggroup1992@gmail.com'),
-            ResidentialAddress::create('', '', '', '', ''),
-            CustomerIdentity::create('', '', ''),
+            CustomerDetail::create('test023423401003122', '61212345678', 'phenix2017pr@gmail.com'),
+            ResidentialAddress::create('FO', '21 FooBarBaz FizBuz', 'Foobaz', '3000 VIC', 'BAZ'),
+            CustomerIdentity::create('FooBarBaz', 'FizBuz', '2001-01-01'),
+            IdentityDocumentCollection::create([IdentityDocument::create(IdentityDocument::DOCUMENT_TYPE_PASSPORT, ['https://www.orimi.com/pdf-test.pdf'], 'BTCBaz007')]),
         );
-        $response = ['success' => true, 'message' => __('KYC data submitted!'), 'data' => $data];
+        $response = ['success' => true, 'message' => __('Banxa KYC data submitted!'), 'data' => $response];
         return $response;
     }
 }

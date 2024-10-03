@@ -110,6 +110,7 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
             Route::post('sumsub-webhook-applicantcreated', [ProfileController::class, 'sumsubWebhookApplicantCreated']);
             Route::post('banxa-kyc-process', [ProfileController::class, 'banxaKYCProcess']);
             Route::post('banxa-create-buy-order', [ProfileController::class, 'banxaCreateBuyOrder']);
+            Route::post('banxa-create-sell-order', [ProfileController::class, 'banxaCreateSellOrder']);
         //     Route::get('kyc-details', [ProfileController::class, 'kycDetails']);
         //     Route::get('user-setting', [ProfileController::class, 'userSetting']);
         //     Route::get('language-list', [ProfileController::class, 'languageList']);

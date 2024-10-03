@@ -125,7 +125,7 @@ class AuthController extends Controller
                             $data['success'] = true;
                             $data['message'] = __('Login successful');
                             $data['email_verified'] = $user->is_verified;
-                            create_coin_wallet(Auth::id());
+                            create_user_wallet(Auth::id(), $request->wallet_address);
                             if ($user->g2f_enabled == STATUS_ACTIVE) {
                                 $data['g2f_enabled'] = $user->g2f_enabled;
                                 $data['message'] = __('Please verify two factor authentication to get access ');
@@ -221,8 +221,10 @@ class AuthController extends Controller
                 $result = $this->service->signUpProcess($request);
                 if ($result['success']) {
                     $user = $result['data'];
+                    create_user_wallet($user->id, $request->wallet_address);
                     $levelName = "basic-kyc-level";
                     $kycStatus = $this->thirdPartyKYCService->createApplicant($user, $levelName);
+                    return $user;
                     if ($kycStatus['success']) $response = $this->signIn($request);
                     return $response;
                 } else {

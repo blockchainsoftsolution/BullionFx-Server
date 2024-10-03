@@ -9,15 +9,9 @@ class Wallet extends Model
 {
     protected $fillable = [
         'user_id',
-        'name',
-        'balance',
-        'referral_balance',
-        'status',
+        'address',
         'is_primary',
-        'coin_type',
-        'coin_id',
-        'key',
-        'type'
+        'status'
     ];
 
     public function user()
@@ -25,12 +19,12 @@ class Wallet extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function co_users()
-    {
-        return $this->hasMany(WalletCoUser::class);
-    }
-    public function coin()
-    {
-        return $this->belongsTo(Coin::class, 'coin_id');
-    }
+    // public function co_users()
+    // {
+    //     return $this->hasMany(WalletCoUser::class);
+    // }
+    // public function coin()
+    // {
+    //     return $this->belongsTo(Coin::class, 'coin_id');
+    // }
 }

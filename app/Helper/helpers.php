@@ -2714,6 +2714,17 @@ function create_coin_wallet($user_id)
     }
 }
 
+function create_user_wallet($user_id, $wallet_address)
+{
+    $check = Wallet::where(['user_id' => $user_id, 'address' => $wallet_address])->first();
+    if (empty($check)) {
+        $a = Wallet::firstOrCreate([
+            'user_id' => $user_id,
+            'address' => $wallet_address
+        ]);
+    }
+}
+
 function storeNewWallet($item)
 {
     $checkWallet = Wallet::where(['user_id' => $item['user_id'], 'coin_id' => $item['coin_id'], 'coin_type' => $item['coin_type']])->first();
