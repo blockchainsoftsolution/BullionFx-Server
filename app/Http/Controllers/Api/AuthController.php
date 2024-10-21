@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use PharIo\Version\Exception;
 use PragmaRX\Google2FA\Google2FA;
@@ -222,9 +223,7 @@ class AuthController extends Controller
                 if ($result['success']) {
                     $user = $result['data'];
                     create_user_wallet($user->id, $request->wallet_address);
-                    $levelName = "basic-kyc-level";
-                    $kycStatus = $this->thirdPartyKYCService->createApplicant($user, $levelName);
-                    return $user;
+                    $kycStatus = $this->thirdPartyKYCService->createApplicant($user);
                     if ($kycStatus['success']) $response = $this->signIn($request);
                     return $response;
                 } else {

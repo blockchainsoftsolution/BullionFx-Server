@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Models\ThirdPartyKycDetails;
 use App\Models\Wallet;
+use App\Models\UserNotificationSetting;
 use Illuminate\Http\Request;
 use App\Http\Services\Logger;
 use App\Http\Services\UserService;
@@ -330,25 +331,51 @@ class ProfileController extends Controller
     // user notification
     public function userNotification()
     {
-        try {
-            $result = Notification::where(['user_id' => Auth::id() ])->orderBy('id','desc')->get();
+        // try {
+            $result = Notification::leftJoin('notification_options', 'notifications.notification_option_id', '=', 'notification_options.id')->where(['user_id' => Auth::id(), 'status' => 0 ])->select('notifications.*', 'notification_options.icon')->orderBy('id','desc')->get();
+            Log::info($result);
+            // if(function_exists("getNotificationListt"))
+            // {
+            //     $support = getNotificationListt();
+            //     $result = $support->merge($result);
 
-            if(function_exists("getNotificationListt"))
-            {
-                $support = getNotificationListt();
-                $result = $support->merge($result);
+            // }
 
-            }
-
-            $result->map(function($query){
-                if(isset($query->ticket_id))
-                {
-                    $query->notification_type = 'support';
-                }else{
-                    $query->notification_type = 'old';
-                }
-            });
+            // $result->map(function($query){
+            //     if(isset($query->ticket_id))
+            //     {
+            //         $query->notification_type = 'support';
+            //     }else{
+            //         $query->notification_type = 'old';
+            //     }
+            // });
             $response = ['success' => true,'message' => __('Notification List'), 'data' => $result];
+        // } catch (\Exception $e) {
+        //     $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+        // }
+        return response()->json($response);
+    }
+
+    // user notification settings
+    public function userNotificationSettings(Request $request) {
+        try {
+            $result = UserNotificationSetting::where(['user_id' => Auth::id()])->get();
+            if ($result->isNotEmpty()) {
+                $response = ['success' => true,'message' => __('Read'), 'data' => $result[0]];
+            } else {
+                $response = ['success' => true,'message' => __('Read'), 'data' => null]; 
+            }
+        } catch (\Exception $e) {
+            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+        }
+        return response()->json($response);
+    }
+
+    // user notification settings
+    public function setUserNotificationSettings(Request $request) {
+        try {
+            $result = UserNotificationSetting::updateOrCreate(['user_id' => Auth::id()], ['disabled' => $request->disabled]);
+            $response = ['success' => true,'message' => __('Updated'), 'data' => $result];
         } catch (\Exception $e) {
             $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
         }
@@ -391,8 +418,7 @@ class ProfileController extends Controller
     public function getSumsubAccessToken()
     {
         $externalUserId = Auth::id();
-        $levelName = "basic-kyc-level";
-        $response = $this->thirdPartyKYCService->getAccessToken($externalUserId, $levelName);
+        $response = $this->thirdPartyKYCService->getAccessToken($externalUserId);
         return response()->json($response);
     }
 
@@ -401,8 +427,8 @@ class ProfileController extends Controller
         $user = Auth::user();
         $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $user->id)->first();
         if (!isset($thirdPartyKYCDetails)) {
-            $levelName = "basic-kyc-level";
-            $kycStatus = $this->thirdPartyKYCService->createApplicant($user, $levelName);
+            return $user;
+            $kycStatus = $this->thirdPartyKYCService->createApplicant($user);
             if ($kycStatus['success'])
                 $thirdPartyKYCDetails = ThirdPartyKycDetails::where('user_id', $user->id)->first();
         }
@@ -425,7 +451,7 @@ class ProfileController extends Controller
                 $user->first_name = $applicantInfo['info']['firstName'];
                 $user->last_name = $applicantInfo['info']['lastName'];
                 $user->save();
-                $response = ['success' => true, 'message' => 'Successfully completed KYC', 'data' => 'success'];
+                $response = ['success' => true, 'message' => 'Successfully completed KYC', 'data' => $user];
             } else {
                 $response = ['success' => false, 'message' => 'KYC not verified yet', 'data' => ''];
             }
@@ -437,12 +463,11 @@ class ProfileController extends Controller
         }
     }
 
-    public function createSumsubApplicant(Request $request) {
-        $externalUserId = Auth::id();
-        $levelName = "basic-kyc-level";
-        $response = $this->thirdPartyKYCService->createApplicant($externalUserId, $levelName);
-        return response()->json($response);
-    }
+    // public function createSumsubApplicant(Request $request) {
+    //     $externalUserId = Auth::id();
+    //     $response = $this->thirdPartyKYCService->createApplicant($externalUserId);
+    //     return response()->json($response);
+    // }
 
     public function sumsubWebhookApplicantCreated(Request $request)
     {

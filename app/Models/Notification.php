@@ -10,7 +10,7 @@ class Notification extends Model
         'user_id',
         'title',
         'notification_body',
-        'type',
+        'notification_option_id',
         'status'
     ];
 }

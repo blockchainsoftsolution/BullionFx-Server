@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\SendGridEmailController;
 use App\Http\Controllers\Api\User\ProfileController;
 use App\Http\Controllers\Api\User\UserBankController;
 use App\Http\Controllers\Api\User\UserCardController;
+use App\Http\Controllers\Api\PublicController;
 use App\Http\Controllers\Api\FaqController;
 
 // For Two factor
@@ -16,14 +17,18 @@ Route::group(['namespace'=>'Api', 'middleware' => ['auth:sanctum','checkApi']], 
     Route::post('check-two-factor','AuthController@twoFactorCheck')->name("twoFactorCheckApi");
 });
 
-Route::group(['middleware' => 'maintenanceMode'], function () {
+Route::group([], function () {
 
-    // Route::group(['namespace' => 'Api\Public', 'prefix' => 'v1/markets', 'middleware' => 'publicSecret'], function () {
-    //     Route::get('price/{pair?}', 'PublicController@getExchangePrice')->name('getExchangeTrade');
-    //     Route::get('orderbook/{pair}', 'PublicController@getExchangeOrderBook')->name('getExchangeOrderBook');
-    //     Route::get('trade/{pair}', 'PublicController@getExchangeTrade')->name('getExchangeTrade');
-    //     Route::get('chart/{pair}', 'PublicController@getExchangeChart')->name('getExchangeChart');
-    // });
+    Route::group(['namespace' => 'Api'], function () {
+        Route::group(['prefix' => 'v1/markets'], function () {
+            Route::get('token-list', [PublicController::class, 'tokenList']);
+        });
+        Route::get('notification-options', [PublicController::class, 'notificationOptions']);
+        // Route::get('price/{pair?}', 'PublicController@getExchangePrice')->name('getExchangeTrade');
+        // Route::get('orderbook/{pair}', 'PublicController@getExchangeOrderBook')->name('getExchangeOrderBook');
+        // Route::get('trade/{pair}', 'PublicController@getExchangeTrade')->name('getExchangeTrade');
+        // Route::get('chart/{pair}', 'PublicController@getExchangeChart')->name('getExchangeChart');
+    });
 
     Route::group(['middleware' => ['checkApi']], function () {
         Route::group(['namespace' => 'Api'], function () {
@@ -90,6 +95,8 @@ Route::group(['middleware' => 'maintenanceMode'], function () {
 
             Route::get('notifications', [ProfileController::class, 'userNotification']);
             Route::post('notification-seen', [ProfileController::class, 'userNotificationSeen']);
+            Route::get('notification-settings', [ProfileController::class, 'userNotificationSettings']);
+            Route::post('set-notification-settings', [ProfileController::class, 'setUserNotificationSettings']);
         //     Route::get('activity-list', 'ProfileController@activityList');
         //     Route::post('update-profile', 'ProfileController@updateProfile');
             Route::post('change-password', [ProfileController::class, 'changePassword']);

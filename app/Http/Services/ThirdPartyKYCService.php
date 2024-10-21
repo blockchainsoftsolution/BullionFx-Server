@@ -32,9 +32,10 @@ class ThirdPartyKYCService
     public function __construct()
     {
         $this->guzzleClient = new Client(['base_uri' => self::BASE_URL]);
-        $settings = allsetting(['sumsub_token', 'sumsub_secret', 'banxa_api', 'banxa_secret', 'banxa_api_v2']);
+        $settings = allsetting(['sumsub_token', 'sumsub_secret', 'banxa_api', 'banxa_secret', 'banxa_api_v2', 'kyc_level_name']);
         $this->appToken = $settings['sumsub_token'];
         $this->secretKey = $settings['sumsub_secret'];
+        $this->kycLevelName = $settings['kyc_level_name'];
 
         $this->subdomain = 'alchemy';
         $this->sandboxApiKey = $settings['banxa_api'];
@@ -64,7 +65,7 @@ class ThirdPartyKYCService
         return hash_hmac('sha256', $data, $secretKey);
     }
 
-    public function createApplicant($user, $levelName)
+    public function createApplicant($user)
     {
         $requestBody = [
             'externalUserId' => $user->id,
@@ -75,8 +76,7 @@ class ThirdPartyKYCService
             //     "placeOfBirth"=> "London"
             // ]
         ];
-
-        $url = '/resources/applicants?' . http_build_query(['levelName' => $levelName]);
+        $url = '/resources/applicants?' . http_build_query(['levelName' => $this->kycLevelName]);
 
         $request = (new Request('POST', $url))
             ->withHeader('Content-Type', 'application/json')
@@ -88,9 +88,9 @@ class ThirdPartyKYCService
         return $response;
     }
 
-    public function getAccessToken($userId, $levelName)
+    public function getAccessToken($userId)
     {
-        $url = '/resources/accessTokens?' . http_build_query(['userId' => $userId, 'levelName' => $levelName]);
+        $url = '/resources/accessTokens?' . http_build_query(['userId' => $userId, 'levelName' => $this->kycLevelName]);
         $request = new Request('POST', $url);
 
         $response = $this->sendRequest($request);
