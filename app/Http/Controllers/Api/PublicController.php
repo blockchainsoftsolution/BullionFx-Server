@@ -48,7 +48,7 @@ class PublicController extends Controller
         $token_list = [
             [
                 'coingecko' => "pax-gold",
-                'icon' => "https://i.postimg.cc/WzvPbrYG/gold.png",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/gold.png",
                 'symbol' => "GOLD",
                 'fullName' => "Gold",
                 'price' => $token_prices['pax-gold']['usd'],
@@ -57,7 +57,7 @@ class PublicController extends Controller
             ],
             [
                 'coingecko' => "usd-coin",
-                'icon' => "https://i.postimg.cc/Gm2n2bK5/usdc.png",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/usdc.png",
                 'symbol' => "USDC",
                 'fullName' => "USD Coin",
                 'price' => $token_prices['usd-coin']['usd'],
@@ -66,7 +66,7 @@ class PublicController extends Controller
             ],
             [
                 'coingecko' => "ethereum",
-                'icon' => "https://i.postimg.cc/TYxRR8Bz/eth.png",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/eth.png",
                 'symbol' => "ETH",
                 'fullName' => "Ethereum",
                 'price' => $token_prices['ethereum']['usd'],
