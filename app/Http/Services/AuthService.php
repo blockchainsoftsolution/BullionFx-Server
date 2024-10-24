@@ -49,6 +49,7 @@ class AuthService
                 'email' => $request['email'],
                 'role' => USER_ROLE_USER,
                 'password' => Hash::make($request['password']),
+                'login_type' => $request['login_type'],
                 'is_verified' => true
             ];
 

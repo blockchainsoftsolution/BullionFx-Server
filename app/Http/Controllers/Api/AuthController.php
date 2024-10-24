@@ -117,106 +117,111 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->first();
 
             if (!empty($user)) {
-                if ($user->role == USER_ROLE_USER) {
-                    if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                        $token = $user->createToken($request->email)->plainTextToken;
-                        //Check email verification
-                        if ($user->status == STATUS_SUCCESS) {
-                            // if (!empty($user->is_verified)) {
-                            $data['success'] = true;
-                            $data['message'] = __('Login successful');
-                            $data['email_verified'] = $user->is_verified;
-                            create_user_wallet(Auth::id(), $request->wallet_address);
-                            if ($user->g2f_enabled == STATUS_ACTIVE) {
-                                $data['g2f_enabled'] = $user->g2f_enabled;
-                                $data['message'] = __('Please verify two factor authentication to get access ');
+                if (!$request->login_type || $user->login_type == $request->login_type) {
+                    if ($user->role == USER_ROLE_USER) {
+                        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                            $token = $user->createToken($request->email)->plainTextToken;
+                            //Check email verification
+                            if ($user->status == STATUS_SUCCESS) {
+                                // if (!empty($user->is_verified)) {
+                                $data['success'] = true;
+                                $data['message'] = __('Login successful');
+                                $data['email_verified'] = $user->is_verified;
+                                create_user_wallet(Auth::id(), $request->wallet_address);
+                                if ($user->g2f_enabled == STATUS_ACTIVE) {
+                                    $data['g2f_enabled'] = $user->g2f_enabled;
+                                    $data['message'] = __('Please verify two factor authentication to get access ');
+                                }
+                                if ($user->email_enabled == STATUS_ACTIVE) {
+                                    $data['email_enabled'] = $user->email_enabled;
+                                    $data['message'] = __('Please verify two factor authentication to get access ');
+                                }
+                                if ($user->phone_enabled == STATUS_ACTIVE) {
+                                    $data['phone_enabled'] = $user->phone_enabled;
+                                    $data['message'] = __('Please verify two factor authentication to get access ');
+                                }
+                                if ($user->g2f_enabled == STATUS_DEACTIVE && $user->email_enabled == STATUS_DEACTIVE && $user->phone_enabled == STATUS_DEACTIVE) {
+                                    $data['token'] = $token;
+                                    $data['access_type'] = 'Bearer';
+                                }
+    
+                                $data['user'] = $user;
+                                $data['user']->photo = show_image_path($user->photo, IMG_USER_PATH);
+                                createUserActivity(Auth::user()->id, USER_ACTIVITY_LOGIN);
+    
+                                return response()->json($data);
+                                // } else {
+                                //     $existsToken = User::join('user_verification_codes', 'user_verification_codes.user_id', 'users.id')
+                                //         ->where('user_verification_codes.user_id', $user->id)
+                                //         ->whereDate('user_verification_codes.expired_at', '>=', Carbon::now()->format('Y-m-d'))
+                                //         ->first();
+                                //     if (!empty($existsToken)) {
+                                //         $mail_key = $existsToken->code;
+                                //     } else {
+                                //         $mail_key = randomNumber(6);
+                                //         UserVerificationCode::create(['user_id' => $user->id, 'code' => $mail_key, 'status' => STATUS_PENDING, 'expired_at' => date('Y-m-d', strtotime('+15 days'))]);
+                                //     }
+                                //     try {
+                                //         $data['email_verified'] = $user->is_verified;
+                                //         $this->service->sendEmail($user, $mail_key, 'verify');
+    
+                                //         $data['success'] = false;
+                                //         $data['message'] = __('Your email is not verified yet. Please verify your mail.');
+                                //         Auth::logout();
+    
+                                //         return response()->json($data, 401);
+                                //     } catch (\Exception $e) {
+                                //         $data['email_verified'] = $user->is_verified;
+                                //         $data['success'] = false;
+                                //         $data['message'] = $e->getMessage();
+                                //         Auth::logout();
+    
+                                //         return response()->json($data, 500);
+                                //     }
+                                // }
+                            } elseif ($user->status == STATUS_SUSPENDED) {
+                                $data['email_verified'] = 1;
+                                $data['success'] = false;
+                                $data['message'] = __("Your account has been suspended. please contact support team to active again");
+                                Auth::logout();
+                                return response()->json($data, 401);
+                            } elseif ($user->status == STATUS_DELETED) {
+                                $data['email_verified'] = 1;
+                                $data['success'] = false;
+                                $data['message'] = __("Your account has been deleted. please contact support team to active again");
+                                Auth::logout();
+                                return response()->json($data, 401);
+                            } elseif ($user->status == STATUS_PENDING) {
+                                $data['email_verified'] = 1;
+                                $data['success'] = false;
+                                $data['message'] = __("Your account has been pending for admin approval. please contact support team to active again");
+                                Auth::logout();
+                                return response()->json($data, 401);
+                            } elseif ($user->status == STATUS_USER_DEACTIVATE) {
+                                $data['email_verified'] = 1;
+                                $data['success'] = false;
+                                $data['message'] = __("Your account has been deactivated. please contact support team to active again");
+                                Auth::logout();
+                                return response()->json($data, 401);
+                            } else {
+                                $data['success'] = false;
+                                $data['message'] = __("User not found!");
+                                return response()->json($data, 401);
                             }
-                            if ($user->email_enabled == STATUS_ACTIVE) {
-                                $data['email_enabled'] = $user->email_enabled;
-                                $data['message'] = __('Please verify two factor authentication to get access ');
-                            }
-                            if ($user->phone_enabled == STATUS_ACTIVE) {
-                                $data['phone_enabled'] = $user->phone_enabled;
-                                $data['message'] = __('Please verify two factor authentication to get access ');
-                            }
-                            if ($user->g2f_enabled == STATUS_DEACTIVE && $user->email_enabled == STATUS_DEACTIVE && $user->phone_enabled == STATUS_DEACTIVE) {
-                                $data['token'] = $token;
-                                $data['access_type'] = 'Bearer';
-                            }
-
-                            $data['user'] = $user;
-                            $data['user']->photo = show_image_path($user->photo, IMG_USER_PATH);
-                            createUserActivity(Auth::user()->id, USER_ACTIVITY_LOGIN);
-
-                            return response()->json($data);
-                            // } else {
-                            //     $existsToken = User::join('user_verification_codes', 'user_verification_codes.user_id', 'users.id')
-                            //         ->where('user_verification_codes.user_id', $user->id)
-                            //         ->whereDate('user_verification_codes.expired_at', '>=', Carbon::now()->format('Y-m-d'))
-                            //         ->first();
-                            //     if (!empty($existsToken)) {
-                            //         $mail_key = $existsToken->code;
-                            //     } else {
-                            //         $mail_key = randomNumber(6);
-                            //         UserVerificationCode::create(['user_id' => $user->id, 'code' => $mail_key, 'status' => STATUS_PENDING, 'expired_at' => date('Y-m-d', strtotime('+15 days'))]);
-                            //     }
-                            //     try {
-                            //         $data['email_verified'] = $user->is_verified;
-                            //         $this->service->sendEmail($user, $mail_key, 'verify');
-
-                            //         $data['success'] = false;
-                            //         $data['message'] = __('Your email is not verified yet. Please verify your mail.');
-                            //         Auth::logout();
-
-                            //         return response()->json($data, 401);
-                            //     } catch (\Exception $e) {
-                            //         $data['email_verified'] = $user->is_verified;
-                            //         $data['success'] = false;
-                            //         $data['message'] = $e->getMessage();
-                            //         Auth::logout();
-
-                            //         return response()->json($data, 500);
-                            //     }
-                            // }
-                        } elseif ($user->status == STATUS_SUSPENDED) {
-                            $data['email_verified'] = 1;
-                            $data['success'] = false;
-                            $data['message'] = __("Your account has been suspended. please contact support team to active again");
-                            Auth::logout();
-                            return response()->json($data, 401);
-                        } elseif ($user->status == STATUS_DELETED) {
-                            $data['email_verified'] = 1;
-                            $data['success'] = false;
-                            $data['message'] = __("Your account has been deleted. please contact support team to active again");
-                            Auth::logout();
-                            return response()->json($data, 401);
-                        } elseif ($user->status == STATUS_PENDING) {
-                            $data['email_verified'] = 1;
-                            $data['success'] = false;
-                            $data['message'] = __("Your account has been pending for admin approval. please contact support team to active again");
-                            Auth::logout();
-                            return response()->json($data, 401);
-                        } elseif ($user->status == STATUS_USER_DEACTIVATE) {
-                            $data['email_verified'] = 1;
-                            $data['success'] = false;
-                            $data['message'] = __("Your account has been deactivated. please contact support team to active again");
-                            Auth::logout();
-                            return response()->json($data, 401);
                         } else {
                             $data['success'] = false;
-                            $data['message'] = __("User not found!");
-                            return response()->json($data, 401);
+                            $data['message'] = __("Email or Password doesn't match");
+                            return response()->json($data, 400);
                         }
                     } else {
                         $data['success'] = false;
-                        $data['message'] = __("Email or Password doesn't match");
-                        return response()->json($data, 400);
+                        $data['message'] = __("You have no login access");
+                        Auth::logout();
+                        return response()->json($data, 404);
                     }
-                } else {
-                    $data['success'] = false;
-                    $data['message'] = __("You have no login access");
-                    Auth::logout();
-                    return response()->json($data, 404);
+                }
+                else {
+                    return response()->json(['error' => 'The login type is not correct. Please keep the first login type.'], 401);
                 }
             } else {
                 $result = $this->service->signUpProcess($request);

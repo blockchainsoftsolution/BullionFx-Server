@@ -50,7 +50,8 @@ class User extends Authenticatable
         'is_default',
         'api_access_allow_user',
         'trade_access_allow_user',
-        'withdrawal_access_allow_user'
+        'withdrawal_access_allow_user',
+        'login_type'
     ];
 
     /**
