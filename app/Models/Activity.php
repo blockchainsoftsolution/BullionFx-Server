@@ -10,7 +10,7 @@ class Activity extends Model
     protected $table = 'activity';
 
 
-    public $timestamps = false; 
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
@@ -19,7 +19,7 @@ class Activity extends Model
         'toAmount',
         'fromAsset',
         'toAsset',
-        'to',
+        'toAddress',
         'status',
         'time',
         'gasFee',

@@ -362,7 +362,7 @@ class ProfileController extends Controller
     {
         Log::info($request);
         try {
-            $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset, 'toAsset' => $request->toAsset, 'to' => $request->to, 'status' => $request->status, 'time' => $request->time, 'gasFee' => $request->gasFee, 'conversionFee' => $request->conversionFee, 'transactionHash' => $request->transactionHash, 'exchangeRate' => $request->exchangeRate]);
+            $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset, 'toAsset' => $request->toAsset, 'toAddress' => $request->toAddress, 'status' => $request->status, 'time' => $request->time, 'gasFee' => $request->gasFee, 'conversionFee' => $request->conversionFee, 'transactionHash' => $request->transactionHash, 'exchangeRate' => $request->exchangeRate]);
             Log::info('Notification Data:', [
                 'user_id' => Auth::id(),
                 'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
@@ -373,7 +373,7 @@ class ProfileController extends Controller
                 Notification::create([
                     'user_id' => Auth::id(),
                     'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
-                    'notification_body' => "You sent {$request->fromAmount} {$request->fromAsset} to {$request->to}",
+                    'notification_body' => "You sent {$request->fromAmount} {$request->fromAsset} to {$request->toAddress}",
                     'notification_option_id' => 3,
                     'time' => $request->time
                 ]);
