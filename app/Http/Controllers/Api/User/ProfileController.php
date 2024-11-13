@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Models\User;
 use App\Models\ActivityLog;
+use App\Models\Activity;
 use App\Models\Notification;
 use App\Models\ThirdPartyKycDetails;
 use App\Models\Wallet;
@@ -45,10 +46,10 @@ class ProfileController extends Controller
     public function profile()
     {
         try {
-          return  $response = $this->service->userProfile(Auth::id());
+            return $response = $this->service->userProfile(Auth::id());
         } catch (\Exception $e) {
             storeException('profile', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -61,10 +62,10 @@ class ProfileController extends Controller
     public function updateProfile(ProfileUpdateRequest $request)
     {
         try {
-            $response = $this->service->userProfileUpdate($request,Auth::id());
+            $response = $this->service->userProfileUpdate($request, Auth::id());
         } catch (\Exception $e) {
             storeException('updateProfile', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -77,10 +78,10 @@ class ProfileController extends Controller
     public function changePassword(ChangePasswordRequest $request)
     {
         try {
-            $response = $this->service->userChangePassword($request,Auth::id());
+            $response = $this->service->userChangePassword($request, Auth::id());
         } catch (\Exception $e) {
             storeException('changePassword', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -96,7 +97,7 @@ class ProfileController extends Controller
             $response = $this->service->sendPhoneVerificationSms(Auth::user());
         } catch (\Exception $e) {
             storeException('sendPhoneVerificationSms', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -112,7 +113,7 @@ class ProfileController extends Controller
             $response = $this->service->phoneVerifyProcess($request, Auth::user());
         } catch (\Exception $e) {
             storeException('phoneVerifyProcess', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -128,7 +129,7 @@ class ProfileController extends Controller
             $response = $this->service->nidUploadProcess($request, Auth::user());
         } catch (\Exception $e) {
             storeException('uploadNid', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -144,7 +145,7 @@ class ProfileController extends Controller
             $response = $this->service->passportUploadProcess($request, Auth::user());
         } catch (\Exception $e) {
             storeException('uploadPassport', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -160,7 +161,7 @@ class ProfileController extends Controller
             $response = $this->service->drivingUploadProcess($request, Auth::user());
         } catch (\Exception $e) {
             storeException('uploadDrivingLicence', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -176,7 +177,7 @@ class ProfileController extends Controller
             $response = $this->service->voterCardUploadProcess($request, Auth::user());
         } catch (\Exception $e) {
             storeException('uploadDrivingLicence', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -191,7 +192,7 @@ class ProfileController extends Controller
             $response = $this->service->kycStatusDetails(Auth::user());
         } catch (\Exception $e) {
             storeException('kycDetails', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -206,7 +207,7 @@ class ProfileController extends Controller
             $response = $this->service->userSettingDetails(Auth::user());
         } catch (\Exception $e) {
             storeException('userSetting', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -221,7 +222,7 @@ class ProfileController extends Controller
             $response = $this->service->languageList();
         } catch (\Exception $e) {
             storeException('languageList', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -237,7 +238,7 @@ class ProfileController extends Controller
             $response = $this->service->setupGoogle2fa($request);
         } catch (\Exception $e) {
             storeException('google2faSetup', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -253,7 +254,7 @@ class ProfileController extends Controller
             $response = $this->service->setupPreferredCurrency($request);
         } catch (\Exception $e) {
             storeException('preferredCurrencySetup', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -269,7 +270,7 @@ class ProfileController extends Controller
             $response = $this->service->setupPreferredLanguage($request);
         } catch (\Exception $e) {
             storeException('preferredLanguageSetup', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -285,7 +286,7 @@ class ProfileController extends Controller
             $response = $this->service->languageSetup($request);
         } catch (\Exception $e) {
             storeException('languageSetup', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -300,7 +301,7 @@ class ProfileController extends Controller
             $response = $this->service->setupGoogle2faLogin(Auth::user());
         } catch (\Exception $e) {
             storeException('setupGoogle2faLogin', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -318,12 +319,13 @@ class ProfileController extends Controller
     /**
      * @return void
      */
-    public function activityList(){
+    public function activityList()
+    {
         try {
-            $result = ActivityLog::where('user_id','=',Auth::id())->get();
-            $response = ['success' => true,'message' => __('Activity List'), 'data' => $result];
+            $result = ActivityLog::where('user_id', '=', Auth::id())->get();
+            $response = ['success' => true, 'message' => __('Activity List'), 'data' => $result];
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -332,52 +334,127 @@ class ProfileController extends Controller
     public function userNotification()
     {
         // try {
-            $result = Notification::leftJoin('notification_options', 'notifications.notification_option_id', '=', 'notification_options.id')->where(['user_id' => Auth::id(), 'status' => 0 ])->select('notifications.*', 'notification_options.icon')->orderBy('id','desc')->get();
-            Log::info($result);
-            // if(function_exists("getNotificationListt"))
-            // {
-            //     $support = getNotificationListt();
-            //     $result = $support->merge($result);
+        $result = Notification::leftJoin('notification_options', 'notifications.notification_option_id', '=', 'notification_options.id')->where(['user_id' => Auth::id(), 'status' => 0])->select('notifications.*', 'notification_options.icon')->orderBy('id', 'desc')->get();
+        Log::info($result);
+        // if(function_exists("getNotificationListt"))
+        // {
+        //     $support = getNotificationListt();
+        //     $result = $support->merge($result);
 
-            // }
+        // }
 
-            // $result->map(function($query){
-            //     if(isset($query->ticket_id))
-            //     {
-            //         $query->notification_type = 'support';
-            //     }else{
-            //         $query->notification_type = 'old';
-            //     }
-            // });
-            $response = ['success' => true,'message' => __('Notification List'), 'data' => $result];
+        // $result->map(function($query){
+        //     if(isset($query->ticket_id))
+        //     {
+        //         $query->notification_type = 'support';
+        //     }else{
+        //         $query->notification_type = 'old';
+        //     }
+        // });
+        $response = ['success' => true, 'message' => __('Notification List'), 'data' => $result];
         // } catch (\Exception $e) {
         //     $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
         // }
         return response()->json($response);
     }
 
+    public function addActivity(Request $request)
+    {
+        Log::info($request);
+        try {
+            $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset, 'toAsset' => $request->toAsset, 'to' => $request->to, 'status' => $request->status, 'time' => $request->time, 'gasFee' => $request->gasFee, 'conversionFee' => $request->conversionFee, 'transactionHash' => $request->transactionHash, 'exchangeRate' => $request->exchangeRate]);
+            Log::info('Notification Data:', [
+                'user_id' => Auth::id(),
+                'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
+                'notification_body' => "You sent {$request->fromAmount} {$request->fromAsset} to {$request->to}",
+                'time' => $request->time ?? now(),
+            ]);
+            if ($request->type === "Sent") {
+                Notification::create([
+                    'user_id' => Auth::id(),
+                    'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
+                    'notification_body' => "You sent {$request->fromAmount} {$request->fromAsset} to {$request->to}",
+                    'notification_option_id' => 3,
+                    'time' => $request->time
+                ]);
+            }
+            if ($request->type === 'Received') {
+                Notification::create([
+                    'user_id' => Auth::id(),
+                    'title' => "{$request->type} {$request->toAmount} {$request->toAsset}",
+                    'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
+                    'notification_option_id' => 3,
+                    'time' => $request->time
+                ]);
+            }
+            if ($request->type === 'Withdrew') {
+                Notification::create([
+                    'user_id' => Auth::id(),
+                    'title' => "Withdrawal Complete",
+                    'notification_body' => "You withdrawal of $ {$request->toAmount} {$request->toAsset} has been completed and will arrive in the nominated bank account soon.",
+                    'notification_option_id' => 1,
+                    'time' => $request->time
+                ]);
+            }
+            // if ($request->type === 'Sold') {
+            //     Notification::create([
+            //         'user_id' => Auth::id(),
+            //         'title' => "{$request->type} {$request->toAmount} {$request->toAsset}",
+            //         'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
+            //         'notification_option_id' => 3,
+            //         'time' => $request->time
+            //     ]);
+            // }
+            // if ($request->type === 'Bought') {
+            //     Notification::create([
+            //         'user_id' => Auth::id(),
+            //         'title' => "{$request->type} {$request->toAmount} {$request->toAsset}",
+            //         'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
+            //         'notification_option_id' => 3,
+            //         'time' => $request->time
+            //     ]);
+            // }
+            if ($request->type === 'Deposited') {
+                Notification::create([
+                    'user_id' => Auth::id(),
+                    'title' => "Deposit Complete",
+                    'notification_body' => "You deposit of $ {$request->fromAmount} {$request->fromAsset} has been received and added to your wallet as USDC.",
+                    'notification_option_id' => 3,
+                    'time' => $request->time
+                ]);
+            }
+
+            $response = ['success' => true, 'message' => __('Add Activity Success')];
+        } catch (\Exception $e) {
+            $response = ['success' => false, 'message' => __('Something went wrong')];
+            Log::error("Notification Creation Error: " . $e->getMessage());
+        }
+    }
+
     // user notification settings
-    public function userNotificationSettings(Request $request) {
+    public function userNotificationSettings(Request $request)
+    {
         try {
             $result = UserNotificationSetting::where(['user_id' => Auth::id()])->get();
             if ($result->isNotEmpty()) {
-                $response = ['success' => true,'message' => __('Read'), 'data' => $result[0]];
+                $response = ['success' => true, 'message' => __('Read'), 'data' => $result[0]];
             } else {
-                $response = ['success' => true,'message' => __('Read'), 'data' => null]; 
+                $response = ['success' => true, 'message' => __('Read'), 'data' => null];
             }
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
 
     // user notification settings
-    public function setUserNotificationSettings(Request $request) {
+    public function setUserNotificationSettings(Request $request)
+    {
         try {
             $result = UserNotificationSetting::updateOrCreate(['user_id' => Auth::id()], ['disabled' => $request->disabled]);
-            $response = ['success' => true,'message' => __('Updated'), 'data' => $result];
+            $response = ['success' => true, 'message' => __('Updated'), 'data' => $result];
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -387,14 +464,14 @@ class ProfileController extends Controller
     {
         try {
             if (isset($request->ids[0])) {
-                $result = Notification::where(['user_id' => Auth::id(), 'status' => STATUS_PENDING ])
-                    ->whereIn('id',$request->ids)->update(['status' => STATUS_ACTIVE]);
-                $response = ['success' => true,'message' => __('Updated'), 'data' => $result];
+                $result = Notification::where(['user_id' => Auth::id(), 'status' => STATUS_PENDING])
+                    ->whereIn('id', $request->ids)->update(['status' => STATUS_ACTIVE]);
+                $response = ['success' => true, 'message' => __('Updated'), 'data' => $result];
             } else {
-                $response = ['success' => false,'message' => __('Id is required'), 'data' => []];
+                $response = ['success' => false, 'message' => __('Id is required'), 'data' => []];
             }
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -405,12 +482,12 @@ class ProfileController extends Controller
         try {
             $response = $this->service->updateFiatCurrency($request);
             if ($response['success'] == true) {
-                $response = ['success' => true,'message' => $response['message'], 'data' => []];
+                $response = ['success' => true, 'message' => $response['message'], 'data' => []];
             } else {
-                $response = ['success' => false,'message' => $response['message'], 'data' => []];
+                $response = ['success' => false, 'message' => $response['message'], 'data' => []];
             }
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }
@@ -437,8 +514,9 @@ class ProfileController extends Controller
         if ($applicantStatus['IDENTITY'] && count($applicantStatus['IDENTITY']['reviewResult']) > 0) {
             $status = $applicantStatus['IDENTITY']['reviewResult']['reviewAnswer'] == 'GREEN' ? 2 : 1;
             $thirdPartyKYCDetails->is_verified = $status;
-            if($status == 2) {
+            if ($status == 2) {
                 // $response = $this->thirdPartyKYCService->banxaKYCProcess($user, $thirdPartyKYCDetails->applicant_id);
+                // $response = $this->thirdPartyKYCService->banxaKYCProcess();
                 $response = $this->thirdPartyKYCService->banxaKYCProcess1();
                 if ($response['success']) {
                     $thirdPartyKYCDetails->banxa_id = $response['data']['account_id'];
@@ -474,24 +552,28 @@ class ProfileController extends Controller
         echo json_encode($request);
     }
 
-    public function banxaKYCProcess(Request $request) {
-        $response = $this->thirdPartyKYCService->banxaKYCProcess($request);
+    public function banxaKYCProcess(Request $request)
+    {
+        // $response = $this->thirdPartyKYCService->banxaKYCProcess($request);
+        $response = $this->thirdPartyKYCService->banxaKYCProcess();
         return response()->json($response);
     }
 
-    public function banxaCreateBuyOrder(Request $request) {
+    public function banxaCreateBuyOrder(Request $request)
+    {
         try {
             $user = Auth::user();
             $wallet = Wallet::where('user_id', $user->id)->first();
             $order_detail = $this->thirdPartyKYCService->banxaCreateBuyOrder($user, $request->fiat, $request->crypto, $wallet->address);
             $response = ['success' => true, 'message' => 'Successfully created a buy order', 'data' => $order_detail];
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong with creating a buy order'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong with creating a buy order'), 'data' => []];
         }
         return response()->json($response);
     }
 
-    public function banxaCreateSellOrder(Request $request) {
+    public function banxaCreateSellOrder(Request $request)
+    {
         $userId = Auth::id();
         $response = $this->thirdPartyKYCService->banxaCreateSellOrder($request);
         return response()->json($response);
@@ -505,11 +587,11 @@ class ProfileController extends Controller
     }
     public function thirdPartyKycVerified(Request $request)
     {
-        if(isset($request->inquiry_id)){
+        if (isset($request->inquiry_id)) {
             $response = $this->thirdPartyKYCService->verifiedPersonaKYC($request);
 
-        }else{
-            $response = ['success'=>false, 'message'=> __('Inquiry id is required!')];
+        } else {
+            $response = ['success' => false, 'message' => __('Inquiry id is required!')];
 
         }
         return response()->json($response);
@@ -530,10 +612,10 @@ class ProfileController extends Controller
     public function generateSecretKey(Request $request)
     {
         try {
-            $response = $this->service->generateSecretKeyToAccessApi($request,Auth::id());
+            $response = $this->service->generateSecretKeyToAccessApi($request, Auth::id());
         } catch (\Exception $e) {
             storeException('generateSecretKey', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -546,10 +628,10 @@ class ProfileController extends Controller
     public function showSecretKey(Request $request)
     {
         try {
-            $response = $this->service->showSecretKeyToAccessApi($request,Auth::id());
+            $response = $this->service->showSecretKeyToAccessApi($request, Auth::id());
         } catch (\Exception $e) {
             storeException('showSecretKeyToAccessApi', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -560,7 +642,7 @@ class ProfileController extends Controller
             $response = $this->service->getApiSettings();
         } catch (\Exception $e) {
             storeException('getApiSettings', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -571,7 +653,7 @@ class ProfileController extends Controller
             $response = $this->service->updateApiSettings($request);
         } catch (\Exception $e) {
             storeException('updateApiSettings', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -582,7 +664,7 @@ class ProfileController extends Controller
             $response = $this->service->getApiWhiteList($request);
         } catch (\Exception $e) {
             storeException('getApiWhiteList', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -593,7 +675,7 @@ class ProfileController extends Controller
             $response = $this->service->addApiWhiteList($request);
         } catch (\Exception $e) {
             storeException('getApiWhiteList', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -604,7 +686,7 @@ class ProfileController extends Controller
             $response = $this->service->changeApiWhiteListStatus($id, $type, $value);
         } catch (\Exception $e) {
             storeException('changeApiWhiteListStatus', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -615,7 +697,7 @@ class ProfileController extends Controller
             $response = $this->service->deleteApiWhiteList($id);
         } catch (\Exception $e) {
             storeException('deleteApiWhiteList', $e->getMessage());
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }
@@ -626,7 +708,7 @@ class ProfileController extends Controller
         try {
             $response = $this->service->setupYieldStatus($request);
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => ''];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
         }
         return response()->json($response);
     }

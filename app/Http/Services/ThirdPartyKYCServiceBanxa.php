@@ -16,7 +16,7 @@ use Banxa\Domains\Orders\Builders\BuyOrderTransaction;
 use Banxa\Domains\Orders\Builders\OptionalOrderParameters;
 use GuzzleHttp\Client;
 
-class ThirdPartyKYCService
+class ThirdPartyKYCServiceBanxa
 {
     private $subdomain;
     private $sandboxApiKey;
@@ -129,7 +129,8 @@ class ThirdPartyKYCService
         // return $response;
     }
 
-    public function banxaCreateBuyOrder($request) {
+    public function banxaCreateBuyOrder($request)
+    {
         // //create a buy order
         // $accountReference = 'test0234223423423434111233';
         // $fiatCode = 'AUD';
@@ -208,19 +209,20 @@ class ThirdPartyKYCService
 
     }
 
-    public function banxaKYCProcess() {
+    public function banxaKYCProcess()
+    {
         $subdomain = 'alchemy';
         $sandboxApiKey = '78b2f18b72e67648c1e3f1ca72449ac3532605ce';
         $sandboxApiSecret = 'w1oQZdP954aPhpEBOMTnEcW95LmOL4DH';
         $client = new Client();
 
         $response = $client->request('POST', 'https://alchemy.banxa-sandbox.com/api/identities', [
-          'body' => '{"customer_identity":{"taxId":"456-44-4564","taxState":"CA","residential_address":{"country":"GB"},"given_name":"Joe","surname":"Bloggs","dob":"1990-01-01"},"account_reference":"test0010011234","email":"kane.smartdev@gmail.com","identity_documents":[{"images":{"link":"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"},"data":{"number":"123456789"},"type":"PASSPORT"}]}',
-          'headers' => [
-            'Accept' => 'application/json',
-            'content-type' => 'application/json',
-            'x-api-key' => 'Token 78b2f18b72e67648c1e3f1ca72449ac3532605ce',
-          ],
+            'body' => '{"customer_identity":{"taxId":"456-44-4564","taxState":"CA","residential_address":{"country":"GB"},"given_name":"Joe","surname":"Bloggs","dob":"1990-01-01"},"account_reference":"test0010011234","email":"kane.smartdev@gmail.com","identity_documents":[{"images":{"link":"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"},"data":{"number":"123456789"},"type":"PASSPORT"}]}',
+            'headers' => [
+                'Accept' => 'application/json',
+                'content-type' => 'application/json',
+                'x-api-key' => 'Token 78b2f18b72e67648c1e3f1ca72449ac3532605ce',
+            ],
         ]);
 
         echo $response->getBody();

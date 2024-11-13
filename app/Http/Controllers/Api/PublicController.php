@@ -20,9 +20,10 @@ class PublicController extends Controller
     /**
      * token prices
      */
-    private function getTokenPrices() {
-        $current_time = now() -> timestamp;
-        if ( $current_time - $this->last_time_token_prices < $this->token_prices_interval) {
+    private function getTokenPrices()
+    {
+        $current_time = now()->timestamp;
+        if ($current_time - $this->last_time_token_prices < $this->token_prices_interval) {
             return $this->token_prices;
         } else {
             try {
@@ -48,7 +49,7 @@ class PublicController extends Controller
         $token_list = [
             [
                 'coingecko' => "pax-gold",
-                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/gold.png",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/gold.svg",
                 'symbol' => "GOLD",
                 'fullName' => "Gold",
                 'price' => $token_prices['pax-gold']['usd'],
@@ -57,23 +58,23 @@ class PublicController extends Controller
             ],
             [
                 'coingecko' => "usd-coin",
-                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/usdc.png",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/usdc.svg",
                 'symbol' => "USDC",
                 'fullName' => "USD Coin",
                 'price' => $token_prices['usd-coin']['usd'],
                 'isShow' => true,
                 'address' => "0x2979508DE07B8fE905F54Cc7099E5A76638847E4",
             ],
-            [
-                'coingecko' => "ethereum",
-                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/eth.png",
-                'symbol' => "ETH",
-                'fullName' => "Ethereum",
-                'price' => $token_prices['ethereum']['usd'],
-                'address' => "ETH",
-            ],
+            // [
+            //     'coingecko' => "ethereum",
+            //     'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/eth.svg",
+            //     'symbol' => "ETH",
+            //     'fullName' => "Ethereum",
+            //     'price' => $token_prices['ethereum']['usd'],
+            //     'address' => "ETH",
+            // ],
         ];
-        
+
         return response()->json($token_list);
     }
 
@@ -81,12 +82,13 @@ class PublicController extends Controller
      * notification list
      * @return \Illuminate\Http\JsonResponse
      */
-    public function notificationOptions() {
+    public function notificationOptions()
+    {
         try {
             $result = NotificationOption::get();
-            $response = ['success' => true,'message' => __('read'), 'data' => $result];
+            $response = ['success' => true, 'message' => __('read'), 'data' => $result];
         } catch (\Exception $e) {
-            $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
         }
         return response()->json($response);
     }

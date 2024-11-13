@@ -69,7 +69,7 @@ class ThirdPartyKYCService
     {
         $requestBody = [
             'externalUserId' => $user->id,
-            "email"=> $user->email,
+            "email" => $user->email,
             // "phone"=> "+449112081223",
             // "fixedInfo"=> [
             //     "country"=> "GBR",
@@ -147,7 +147,7 @@ class ThirdPartyKYCService
 
     protected function parseBody($response)
     {
-        $data = (string)$response->getBody();
+        $data = (string) $response->getBody();
         $json = json_decode($data, true, JSON_THROW_ON_ERROR);
         if (!is_array($json)) {
             throw new RuntimeException('Invalid response received: ' . $data);
@@ -159,34 +159,36 @@ class ThirdPartyKYCService
     public function banxaAuthenticator($method, $url, $body, $nonce)
     {
         $sign = hash_hmac('SHA256', $method . '\n' . $url . '\n' . $nonce . '\n' . $body, $this->sandboxApiSecret);
-        return $this->sandboxApiKey.':'.$sign.':'.$nonce;
+        return $this->sandboxApiKey . ':' . $sign . ':' . $nonce;
 
     }
 
-    public function banxaKYCProcess() {
+    public function banxaKYCProcess()
+    {
         $client = new Client();
         $method = 'POST';
         $url = '/api/identities';
         $body = '{"account_reference":"70","email":"traininggroup1992@gmail.com","identity_sharing":[{"provider":"sumsub","token":"66fc133fa6408070acf81235"}]}';
-        $nonce = time();
+        $nonce = time() + 230;
         $response = $client->request('POST', 'https://ALCHEMY.banxa-sandbox.com' . $url, [
-          'body' => $body,
-          'headers' => [
-            'Accept' => 'application/json',
-            'content-type' => 'application/json',
-            'Authorization' => 'Bearer ' . $this->sandboxApiKey . ':' . $this->banxaAuthenticator($method, $url, $body, $nonce) . $nonce,
-          ],
+            'body' => $body,
+            'headers' => [
+                'Accept' => 'application/json',
+                'content-type' => 'application/json',
+                'Authorization' => 'Bearer ' . $this->sandboxApiKey . ':' . $this->banxaAuthenticator($method, $url, $body, $nonce) . $nonce,
+            ],
         ]);
-        
+
         $body = $response->getBody();
         $data = json_decode($body, true);
         return $data;
     }
 
-    public function banxaCreateBuyOrder($user, $fiat, $crypto, $wallet_address) {
+    public function banxaCreateBuyOrder($user, $fiat, $crypto, $wallet_address)
+    {
         $client = new Client();
         $response = $client->request('POST', 'https://api.banxa-sandbox.com/ALCHEMY/v2/buy', [
-            'body' => '{"crypto":"' . $crypto .'","fiat":"'. $fiat .'","fiatAmount":"2000","walletAddress":"'. $wallet_address .'","redirectUrl":"https://bullionfx.com","email":"'. $user->email .'","externalCustomerId":"'. $user->id .'"}',
+            'body' => '{"crypto":"' . $crypto . '","fiat":"' . $fiat . '","fiatAmount":"2000","walletAddress":"' . $wallet_address . '","redirectUrl":"https://bullionfx.com","email":"' . $user->email . '","externalCustomerId":"' . $user->id . '"}',
             'headers' => [
                 'Accept' => 'application/json',
                 'content-type' => 'application/json',
@@ -199,10 +201,11 @@ class ThirdPartyKYCService
         return $data;
     }
 
-    public function banxaCreateSellOrder($user, $fiat, $crypto, $wallet_address) {
+    public function banxaCreateSellOrder($user, $fiat, $crypto, $wallet_address)
+    {
         $client = new Client();
         $response = $client->request('POST', 'https://api.banxa-sandbox.com/ALCHEMY/v2/buy', [
-            'body' => '{"crypto":' . $crypto .',"fiat":'. $fiat .',"fiatAmount":"2000","walletAddress":'. $wallet_address .',"redirectUrl":"https://bullionfx.com","email":'. $user->email .',"externalCustomerId":'. $user->id .'}',
+            'body' => '{"crypto":' . $crypto . ',"fiat":' . $fiat . ',"fiatAmount":"2000","walletAddress":' . $wallet_address . ',"redirectUrl":"https://bullionfx.com","email":' . $user->email . ',"externalCustomerId":' . $user->id . '}',
             'headers' => [
                 'Accept' => 'application/json',
                 'content-type' => 'application/json',
