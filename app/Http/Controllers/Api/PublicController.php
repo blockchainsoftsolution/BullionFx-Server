@@ -54,7 +54,7 @@ class PublicController extends Controller
                 'fullName' => "Gold",
                 'price' => $token_prices['pax-gold']['usd'],
                 'isShow' => true,
-                'address' => "0xDe991c4F25FC01CeB004f93d147E9125FF823D2D",
+                'address' => "0xC2F25646323F4F1e03cdDf03b886Ad4E5043F214",
             ],
             [
                 'coingecko' => "usd-coin",
@@ -63,7 +63,7 @@ class PublicController extends Controller
                 'fullName' => "USD Coin",
                 'price' => $token_prices['usd-coin']['usd'],
                 'isShow' => true,
-                'address' => "0x2979508DE07B8fE905F54Cc7099E5A76638847E4",
+                'address' => "0x41d393ae236d08155301529a33B15DE4504696c7",
             ],
             // [
             //     'coingecko' => "ethereum",

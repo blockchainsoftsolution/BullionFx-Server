@@ -335,7 +335,7 @@ class ProfileController extends Controller
     {
         // try {
         $result = Notification::leftJoin('notification_options', 'notifications.notification_option_id', '=', 'notification_options.id')->where(['user_id' => Auth::id(), 'status' => 0])->select('notifications.*', 'notification_options.icon')->orderBy('id', 'desc')->get();
-        Log::info($result);
+        // Log::info($result);
         // if(function_exists("getNotificationListt"))
         // {
         //     $support = getNotificationListt();
@@ -360,7 +360,7 @@ class ProfileController extends Controller
 
     public function addActivity(Request $request)
     {
-        Log::info($request);
+        // Log::info($request);
         try {
             $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset, 'toAsset' => $request->toAsset, 'toAddress' => $request->toAddress, 'status' => $request->status, 'time' => $request->time, 'gasFee' => $request->gasFee, 'conversionFee' => $request->conversionFee, 'transactionHash' => $request->transactionHash, 'exchangeRate' => $request->exchangeRate]);
             Log::info('Notification Data:', [
