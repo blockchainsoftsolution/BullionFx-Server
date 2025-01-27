@@ -18,13 +18,12 @@ class Activity extends Model
         'fromAmount',
         'toAmount',
         'fromAsset',
+        'fromAssetSymbol',
         'toAsset',
+        'toAssetSymbol',
         'toAddress',
         'status',
         'time',
-        'gasFee',
-        'conversionFee',
-        'transactionHash',
-        'exchangeRate'
+        'transactionHash'
     ];
 }

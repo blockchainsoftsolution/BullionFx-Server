@@ -26,6 +26,7 @@ use App\Http\Requests\Api\apiWhiteListRequest;
 use App\Http\Requests\Api\ProfileUpdateRequest;
 use App\Http\Requests\Api\ChangePasswordRequest;
 use App\Http\Requests\Api\UpdateCurrencyRequest;
+use App\Utils\StringHelper;
 
 class ProfileController extends Controller
 {
@@ -329,6 +330,17 @@ class ProfileController extends Controller
         }
         return response()->json($response);
     }
+    
+    public function getUserActivities()
+    {
+        try {
+            $result = Activity::where('user_id', '=', Auth::id())->orderBy("time", 'desc')->get();
+            $response = ['success' => true, 'message' => __('Activity'), 'data' => $result];
+        } catch (\Exception $e) {
+            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
+        }
+        return response()->json($response);
+    }
 
     // user notification
     public function userNotification()
@@ -362,7 +374,8 @@ class ProfileController extends Controller
     {
         // Log::info($request);
         try {
-            $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset, 'toAsset' => $request->toAsset, 'toAddress' => $request->toAddress, 'status' => $request->status, 'time' => $request->time, 'gasFee' => $request->gasFee, 'conversionFee' => $request->conversionFee, 'transactionHash' => $request->transactionHash, 'exchangeRate' => $request->exchangeRate]);
+            $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset,
+            'fromAssetSymbol' => $request->fromAssetSymbol, 'toAsset' => $request->toAsset, 'toAssetSymbol' => $request->toAssetSymbol, 'toAddress' => $request->toAddress, 'status' => $request->status, 'time' => $request->time, 'transactionHash' => $request->transactionHash]);
             Log::info('Notification Data:', [
                 'user_id' => Auth::id(),
                 'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
@@ -372,53 +385,44 @@ class ProfileController extends Controller
             if ($request->type === "Sent") {
                 Notification::create([
                     'user_id' => Auth::id(),
-                    'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
-                    'notification_body' => "You sent {$request->fromAmount} {$request->fromAsset} to {$request->toAddress}",
+                    'title' => "Sent {$request->fromAmount} {$request->fromAssetSymbol}",
+                    'notification_body' => "You sent {$request->fromAmount} {$request->fromAssetSymbol} to" . " " . StringHelper::toShortAddr($request->toAddress),
                     'notification_option_id' => 3,
                     'time' => $request->time
                 ]);
             }
-            if ($request->type === 'Received') {
-                Notification::create([
-                    'user_id' => Auth::id(),
-                    'title' => "{$request->type} {$request->toAmount} {$request->toAsset}",
-                    'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
-                    'notification_option_id' => 3,
-                    'time' => $request->time
-                ]);
-            }
+            // if ($request->type === 'Received') {
+            //     Notification::create([
+            //         'user_id' => Auth::id(),
+            //         'title' => "Received {$request->toAmount} {$request->toAsset}",
+            //         'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
+            //         'notification_option_id' => 3,
+            //         'time' => $request->time
+            //     ]);
+            // }
             if ($request->type === 'Withdrew') {
                 Notification::create([
                     'user_id' => Auth::id(),
                     'title' => "Withdrawal Complete",
-                    'notification_body' => "You withdrawal of $ {$request->toAmount} {$request->toAsset} has been completed and will arrive in the nominated bank account soon.",
-                    'notification_option_id' => 1,
+                    'notification_body' => "Your withdrawal of ${$request->fromAmount} {$request->fromAssetSymbol} has been completed and will arrive in the nominated bank account soon.",
+                    'notification_option_id' => 3,
                     'time' => $request->time
                 ]);
             }
-            // if ($request->type === 'Sold') {
-            //     Notification::create([
-            //         'user_id' => Auth::id(),
-            //         'title' => "{$request->type} {$request->toAmount} {$request->toAsset}",
-            //         'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
-            //         'notification_option_id' => 3,
-            //         'time' => $request->time
-            //     ]);
-            // }
-            // if ($request->type === 'Bought') {
-            //     Notification::create([
-            //         'user_id' => Auth::id(),
-            //         'title' => "{$request->type} {$request->toAmount} {$request->toAsset}",
-            //         'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
-            //         'notification_option_id' => 3,
-            //         'time' => $request->time
-            //     ]);
-            // }
+            if ($request->type === 'Swapped') {
+                Notification::create([
+                    'user_id' => Auth::id(),
+                    'title' => "Swap Completed",
+                    'notification_body' => "Swapped {$request->fromAmount} {$request->fromAssetSymbol} for {$request->toAmount} {$request->toAssetSymbol}",
+                    'notification_option_id' => 3,
+                    'time' => $request->time
+                ]);
+            }
             if ($request->type === 'Deposited') {
                 Notification::create([
                     'user_id' => Auth::id(),
                     'title' => "Deposit Complete",
-                    'notification_body' => "You deposit of $ {$request->fromAmount} {$request->fromAsset} has been received and added to your wallet as USDC.",
+                    'notification_body' => "Your deposit of ${$request->fromAmount} {$request->fromAssetSymbol} has been received and added to your wallet as USDC.",
                     'notification_option_id' => 3,
                     'time' => $request->time
                 ]);
