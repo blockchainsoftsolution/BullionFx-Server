@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\User\UserCardController;
 use App\Http\Controllers\Api\PublicController;
 use App\Http\Controllers\Api\FaqController;
 
+use Illuminate\Support\Facades\Cache;
+
 // For Two factor
 Route::group(['namespace'=>'Api', 'middleware' => ['auth:sanctum','checkApi']], function (){
     Route::get('two-factor-list','AuthController@twoFactorList')->name("twoFactorListApi");
@@ -56,7 +58,83 @@ Route::group([], function () {
             // Route::get('market-overview-coin-statistic-list', 'LandingController@getMarketOverviewCoinStatisticList');
             // Route::get('market-overview-top-coin-list', 'LandingController@getMarketOverviewTopCoinList');
 
-            // Route::get('currency-list', 'LandingController@currencyList');
+            Route::get('hour-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_1H_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
+            Route::get('day-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_1D_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
+            Route::get('week-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_1W_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
+            Route::get('month-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_1M_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
+            Route::get('three-month-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_3M_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
+            Route::get('year-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_1Y_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
+            Route::get('all-gold-price', function () {
+                // Check if cached data exists
+                $data = Cache::get('coingecko_All_gold_price');
+            
+                // If the data doesn't exist in the cache, fetch and store it
+                if (!$data) {
+                    return [];
+                }
+            
+                return $data;
+            });
             // Route::get('public-site-settings', 'LandingController@publicSiteSettings');
         });
         // Route::group(['namespace' => 'Api\User'], function () {
