@@ -310,7 +310,9 @@ Route::group([], function () {
 
         //         Route::get('test', 'FutureTradeController@test');
         //     });
-
+            Route::get('user-token-balances', [ProfileController::class, 'userTokenBalances']);
+            Route::post('user-token-balance-history', [ProfileController::class, 'userTokenBalanceHistory']);
+            Route::post('user-token-transaction-history', [ProfileController::class, 'userTokenTransactionHistory']);
         });
         // Route::group(['namespace' => 'Api\User', 'group' => 'gift_card', 'prefix' => 'gift-card'], function () {
         //     Route::get('gift-card-main-page', 'GiftCardController@giftCardMainPageData');
