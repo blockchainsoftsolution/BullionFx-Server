@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Models\TokenTransfer;
 use App\Models\User;
 use App\Models\ActivityLog;
 use App\Models\Activity;
@@ -26,6 +27,8 @@ use App\Http\Services\ThirdPartyKYCService;
 use App\Http\Services\UserService;
 
 use App\Utils\StringHelper;
+
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,7 +56,7 @@ class ProfileController extends Controller
     public function profile()
     {
         try {
-            return $response = $this->service->userProfile(Auth::id());
+            $response = $this->service->userProfile(Auth::id());
         } catch (\Exception $e) {
             storeException('profile', $e->getMessage());
             $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => ''];
@@ -382,12 +385,6 @@ class ProfileController extends Controller
         try {
             $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset,
             'fromAssetSymbol' => $request->fromAssetSymbol, 'toAsset' => $request->toAsset, 'toAssetSymbol' => $request->toAssetSymbol, 'toAddress' => $request->toAddress, 'status' => $request->status, 'time' => $request->time, 'transactionHash' => $request->transactionHash]);
-            Log::info('Notification Data:', [
-                'user_id' => Auth::id(),
-                'title' => "{$request->type} {$request->fromAmount} {$request->fromAsset}",
-                'notification_body' => "You sent {$request->fromAmount} {$request->fromAsset} to {$request->to}",
-                'time' => $request->time ?? now(),
-            ]);
             if ($request->type === "Sent") {
                 Notification::create([
                     'user_id' => Auth::id(),
@@ -410,7 +407,7 @@ class ProfileController extends Controller
                 Notification::create([
                     'user_id' => Auth::id(),
                     'title' => "Withdrawal Complete",
-                    'notification_body' => "Your withdrawal of ${$request->fromAmount} {$request->fromAssetSymbol} has been completed and will arrive in the nominated bank account soon.",
+                    'notification_body' => "Your withdrawal of {$request->fromAmount} {$request->fromAssetSymbol} has been completed and will arrive in the nominated bank account soon.",
                     'notification_option_id' => 3,
                     'time' => $request->time
                 ]);
@@ -428,7 +425,7 @@ class ProfileController extends Controller
                 Notification::create([
                     'user_id' => Auth::id(),
                     'title' => "Deposit Complete",
-                    'notification_body' => "Your deposit of ${$request->fromAmount} {$request->fromAssetSymbol} has been received and added to your wallet as USDC.",
+                    'notification_body' => "Your deposit of {$request->fromAmount} {$request->fromAssetSymbol} has been received and added to your wallet as USDC.",
                     'notification_option_id' => 3,
                     'time' => $request->time
                 ]);
@@ -756,41 +753,40 @@ class ProfileController extends Controller
                 $user_token_balance_history[strtolower($token)] = [];
             }
             foreach ($user_token_transfer_history['data'] as $transfer) {
-                $block_num = $transfer['blockNum'];
-                $token = strtolower($transfer['rawContract']['address']);
+                $block = $transfer['block'];
+                $token = strtolower($transfer['address']);
                 $amount = $transfer['value'];
                 if (!array_key_exists($token, $user_token_balance_history)) continue;
                 if (strtolower($transfer['to']) == strtolower($wallet->address)) { // receive
                     if (count($user_token_balance_history[$token]) == 0) { // first receive
                         array_push($user_token_balance_history[$token], [
-                            "block" => $block_num,
+                            "block" => $block,
                             "balance" => $amount
                         ]);
                         continue;
                     }
                     $last_balance_data = end($user_token_balance_history[$token]);
                     $last_balance = $last_balance_data['balance'];
-                    if ($last_balance_data['block'] == $block_num) { // same block number
+                    if ($last_balance_data['block'] == $block) { // same block number
                         array_pop($user_token_balance_history[$token]);
                     }
                     array_push($user_token_balance_history[$token], [
-                        "block" => $block_num,
+                        "block" => $block,
                         "balance" => $last_balance + $amount
                     ]);
                 }
                 if (strtolower($transfer['from']) == strtolower($wallet->address)) {
                     $last_balance_data = end($user_token_balance_history[$token]);
                     $last_balance = $last_balance_data['balance'];
-                    if ($last_balance_data['block'] == $block_num) { // same block number
+                    if ($last_balance_data['block'] == $block) { // same block number
                         array_pop($user_token_balance_history[$token]);
                     }
                     array_push($user_token_balance_history[$token], [
-                        "block" => $block_num,
+                        "block" => $block,
                         "balance" => $last_balance - $amount
                     ]);
                 }
             }
-            // Log::info("check: ", [$user_token_balance_history]);
             return response()->json($user_token_balance_history);
         }
         return response()->json(['error' => 'Alchemy request failed'], $user_token_transfer_history["data"]);
@@ -811,115 +807,73 @@ class ProfileController extends Controller
 
         $user_token_transfer_history = $this->fetchUserTokenTransfers($chain_id, $wallet->address);
         if ($user_token_transfer_history['status'] == "success") {
+            // Log::info("check: ", [$token_transfers]);
             $user_token_transactions = [];
             foreach ($user_token_transfer_history['data'] as $transfer) {
-                $block_num = $transfer['blockNum'];
-                $hash = $transfer['hash'];
-                $token = strtolower($transfer['rawContract']['address']);
-                $amount = $transfer['value'];
-                $from = strtolower($transfer['from']);
-                $to = strtolower($transfer['to']);
-                $asset = $transfer['asset'];
-                if (strtolower($transfer['to']) == strtolower($wallet->address)) { // receive
-                    $index = array_keys(array_filter($user_token_transactions, function($v) use ($hash) {
-                        return $v['hash'] == $hash;
-                    }))[0] ?? -1;
-                    if ($index == -1) { // first hash
-                        array_push($user_token_transactions, [
-                            "block" => $block_num,
-                            "hash" => $hash,
-                            "froms" => [$from],
-                            "in_assets" => [$token],
-                            "in_asset_symbols" => [$asset],
-                            "in_amounts" => [$amount],
-                            "tos" => [],
-                            "out_assets" => [],
-                            "out_asset_symbols" => [],
-                            "out_amounts" => []
-                        ]);
-                        continue;
-                    }
-                    $prev = array_splice($user_token_transactions, $index, 1)[0];
-                    $froms = [];
-                    $in_ssets = [];
-                    $in_asset_symbols = [];
-                    $in_amounts = [];
-                    if (array_key_exists("froms", $prev)) {
-                        $froms = $prev['froms'];
-                        $in_assets = $prev['in_assets'];
-                        $in_asset_symbols = $prev['in_asset_symbols'];
-                        $in_amounts = $prev['in_amounts'];
-                    }
-                    array_push($froms, $from);
-                    array_push($in_assets, $token);
-                    array_push($in_asset_symbols, $asset);
-                    array_push($in_amounts, $amount);
-                    array_splice($user_token_transactions, $index, 0, [[
-                        "block" => $block_num,
-                        "hash" => $hash,
-                        "froms" => $froms,
-                        "in_assets" => $in_assets,
-                        "in_asset_symbols" => $in_asset_symbols,
-                        "in_amounts" => $in_amounts,
-                        "tos" => array_key_exists("tos", $prev) ? $prev["tos"] : [],
-                        "out_assets" => array_key_exists("out_assets", $prev) ? $prev["out_assets"] : [],
-                        "out_asset_symbols" => array_key_exists("out_asset_symbols", $prev) ? $prev["out_asset_symbols"] : [],
-                        "out_amounts" => array_key_exists("out_amounts", $prev) ? $prev["out_amounts"] : [],
-                    ]]);
+                $key = $transfer['block'] . '-' . $transfer['hash'];
+                if (!array_key_exists($key, $user_token_transactions)) {
+                    $user_token_transactions[$key] = [
+                        'block' => $transfer['block'],
+                        'hash' => $transfer['hash'],
+                        'data' => [
+                        ]
+                    ];
                 }
-                if (strtolower($transfer['from']) == strtolower($wallet->address)) {
-                    $index = array_keys(array_filter($user_token_transactions, function($v) use ($hash) {
-                        return $v['hash'] == $hash;
-                    }))[0] ?? -1;
-                    if ($index == -1) { // first hash
-                        array_push($user_token_transactions, [
-                            "block" => $block_num,
-                            "hash" => $hash,
-                            "tos" => [$to],
-                            "out_assets" => [$token],
-                            "out_asset_symbols" => [$asset],
-                            "out_amounts" => [$amount],
-                            "froms" => [],
-                            "in_assets" => [],
-                            "in_asset_symbols" => [],
-                            "in_amounts" => []
-                        ]);
-                        continue;
+                array_push($user_token_transactions[$key]['data'], [
+                    'from' => $transfer['from'],
+                    'to' => $transfer['to'],
+                    'asset' => $transfer['asset'],
+                    'address' => $transfer['address'],
+                    'value' => $transfer['value'],
+                    'decimal' => $transfer['decimal']
+                ]);
+            }
+
+            $result = [];
+            foreach ($user_token_transactions as $transaction) {
+                if (count($transaction['data']) == 1) {
+                    $is_send = $transaction['data'][0]['from'] == strtolower($wallet->address);
+                    array_push($result, [
+                        'type' => $is_send ? 'send' : 'receive',
+                        'block' => $transaction['block'],
+                        'hash' => $transaction['hash'],
+                        'data' => $transaction['data']
+                    ]);
+                } else {
+                    if (count($transaction['data']) == 2 && $transaction['data'][0]['from'] === strtolower($wallet->address) && $transaction['data'][1]['from'] === strtolower($wallet->address) && $transaction['data'][0]['asset'] == "GOLD" && $transaction['data'][1]['asset'] == "GOLD") {
+                    array_push($result, [
+                        'type' => "send",
+                        'block' => $transaction['block'],
+                        'hash' => $transaction['hash'],
+                        'data' => [$transaction['data'][0]]
+                    ]);
+                    array_push($result, [
+                        'type' => "send",
+                        'block' => $transaction['block'],
+                        'hash' => $transaction['hash'],
+                        'data' => [$transaction['data'][1]]
+                    ]);
+                    continue;
                     }
-                    $prev = array_splice($user_token_transactions, $index, 1)[0];
-                    $tos = [];
-                    $out_ssets = [];
-                    $out_asset_symbols = [];
-                    $out_amounts = [];
-                    if (array_key_exists("tos", $prev)) {
-                        $tos = $prev['tos'];
-                        $out_assets = $prev['out_assets'];
-                        $out_asset_symbols = $prev['out_asset_symbols'];
-                        $out_amounts = $prev['out_amounts'];
+                    $type = 'contract_interaction';
+                    if ($transaction['data'][0]['from'] == strtolower(env('TRADER')) || $transaction['data'][0]['to'] == strtolower(env('TRADER')) || $transaction['data'][1]['from'] == strtolower(env('TRADER')) || $transaction['data'][1]['to'] == strtolower(env('TRADER'))) {
+                        $type = 'swap';
+                        foreach($transaction['data'] as $each) {
+                            if ($each['asset'] != 'USDC' && $each['asset'] != 'GOLD') {
+                                $type = 'contract_interaction';
+                                break;
+                            }
+                        }
                     }
-                    array_push($tos, $to);
-                    array_push($out_assets, $token);
-                    array_push($out_asset_symbols, $asset);
-                    array_push($out_amounts, $amount);
-                    array_splice($user_token_transactions, $index, 0, [[
-                        "block" => $block_num,
-                        "hash" => $hash,
-                        "froms" => array_key_exists("froms", $prev) ? $prev["froms"] : [],
-                        "in_assets" => array_key_exists("in_assets", $prev) ? $prev["in_assets"] : [],
-                        "in_asset_symbols" => array_key_exists("in_asset_symbols", $prev) ? $prev["in_asset_symbols"] : [],
-                        "in_amounts" => array_key_exists("in_amounts", $prev) ? $prev["in_amounts"] : [],
-                        "tos" => $tos,
-                        "out_assets" => $out_assets,
-                        "out_asset_symbols" => $out_asset_symbols,
-                        "out_amounts" => $out_amounts,
-                    ]]);
+                    array_push($result, [
+                        'type' => $type,
+                        'block' => $transaction['block'],
+                        'hash' => $transaction['hash'],
+                        'data' => $transaction['data']
+                    ]);
                 }
             }
-            $user_token_transactions = array_values(array_filter($user_token_transactions, function($t) use ($tokens) {
-                return count(array_intersect($t["in_assets"], $tokens)) + count(array_intersect($t["out_assets"], $tokens)) > 0;
-            }));
-            // Log::info("user_token_transactions: ", $user_token_transactions);
-            return response()->json($user_token_transactions);
+            return response()->json($result);
         }
         return response()->json(['error' => 'Alchemy request failed'], $user_token_transfer_history["data"]);
     }
@@ -967,6 +921,12 @@ class ProfileController extends Controller
         $cache_key = "user_token_transfers_" . md5($chain_id . $wallet_address);
         $data = Cache::remember($cache_key, env('ALCHEMY_API_DEFAULT_CACHE') ?? 60, function () use ($chain_id, $wallet_address) {
             $url = "https://eth-mainnet.g.alchemy.com/v2/" . env('ALCHEMY_KEY');
+            $last_block = 0;
+            $token_transfers = TokenTransfer::where('from', $wallet_address)->orWhere('to', $wallet_address)->orderBy('block', 'asc')->get();
+            if (TokenTransfer::count() > 0) {
+                $lastTransfer = $token_transfers[count($token_transfers) - 1];
+                $last_block = $lastTransfer->block;
+            }
             switch($chain_id) {
                 case "11155111":
                     $url = "https://eth-sepolia.g.alchemy.com/v2/" . env('ALCHEMY_KEY');
@@ -978,6 +938,7 @@ class ProfileController extends Controller
                 "jsonrpc" => "2.0",
                 "method" => "alchemy_getAssetTransfers",
                 "params" => [[
+                    "fromBlock" => "0x" . dechex($last_block + 1),
                     "fromAddress" => $wallet_address,
                     "category" => ["erc20"]
                 ]],
@@ -992,6 +953,7 @@ class ProfileController extends Controller
                 "jsonrpc" => "2.0",
                 "method" => "alchemy_getAssetTransfers",
                 "params" => [[
+                    "fromBlock" => "0x" . dechex($last_block + 1),
                     "toAddress" => $wallet_address,
                     "category" => ["erc20"]
                 ]],
@@ -1005,12 +967,30 @@ class ProfileController extends Controller
             usort($result, function($a, $b) {
                 return hexdec($a['blockNum']) - hexdec($b['blockNum']);
             });
-            // Log::info("check: ", [$result]);
+            if (count($result) > 0) {
+                $last_block = $result[count($result) - 1]['blockNum'];
+                $new_token_transfers = [];
+                foreach($result as $transfer) {
+                    $token_transfer = [
+                        'block' => hexdec($transfer['blockNum']),
+                        'hash' => $transfer['hash'],
+                        'from' => $transfer['from'],
+                        'to' => $transfer['to'],
+                        'asset' => $transfer['asset'],
+                        'address' => $transfer['rawContract']['address'],
+                        'value' => $transfer['value'],
+                        'decimal' => hexdec($transfer['rawContract']['decimal'])
+                    ];
+                    TokenTransfer::create($token_transfer);
+                    array_push($new_token_transfers, $token_transfer);
+                }
+                $token_transfers = array_merge($token_transfers->toArray(), $new_token_transfers);
+            }
 
             if ($response_from->successful() && $response_to->successful()) {
                 return [
                     "status" => "success",
-                    "data" => $result
+                    "data" => $token_transfers
                 ];
             } else {
                 $error_status = $response_from->successful() ? $response_to->status() : $response_from->status();
@@ -1022,4 +1002,27 @@ class ProfileController extends Controller
         });
         return $data;
     }
+
+    // public function getBlockTimestamp($blockNumber = 'latest')
+    // {
+    //     $url = "https://eth-sepolia.g.alchemy.com/v2/" . env('ALCHEMY_KEY');
+
+    //     $data = [
+    //         'jsonrpc' => '2.0',
+    //         'id' => 1,
+    //         'method' => 'eth_getBlockByNumber',
+    //         'params' => [$blockNumber, false],
+    //     ];
+
+    //     $response = Http::post($url, $data);
+
+    //     $result = json_decode($response->getBody()->getContents(), true);
+
+    //     if (isset($result['result'])) {
+    //         // Convert hex timestamp to decimal
+    //         return hexdec($result['result']['timestamp']);
+    //     }
+
+    //     return null; // Handle error appropriately
+    // }
 }
