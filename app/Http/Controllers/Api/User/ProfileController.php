@@ -923,7 +923,7 @@ class ProfileController extends Controller
             $url = "https://eth-mainnet.g.alchemy.com/v2/" . env('ALCHEMY_KEY');
             $last_block = 0;
             $token_transfers = TokenTransfer::where('from', $wallet_address)->orWhere('to', $wallet_address)->orderBy('block', 'asc')->get();
-            if (TokenTransfer::count() > 0) {
+            if (count($token_transfers) > 0) {
                 $lastTransfer = $token_transfers[count($token_transfers) - 1];
                 $last_block = $lastTransfer->block;
             }
