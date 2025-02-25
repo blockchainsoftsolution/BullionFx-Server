@@ -17,7 +17,8 @@ class TokenTransfer extends Model
         'asset',
         'address',
         'value',
-        'decimal'
+        'decimal',
+        'checked'
     ];
 
     // public function co_users()

@@ -469,13 +469,17 @@ class ProfileController extends Controller
     // user notification
     public function userNotificationSeen(Request $request)
     {
+        $hashs = $request->hashs;
+        $user = Auth::user();
+        $wallet = Wallet::where('user_id', $user->id)->first();
         try {
-            if (isset($request->ids[0])) {
-                $result = Notification::where(['user_id' => Auth::id(), 'status' => STATUS_PENDING])
-                    ->whereIn('id', $request->ids)->update(['status' => STATUS_ACTIVE]);
+            if ($hashs) {
+                $result = TokenTransfer::where(function ($query) use ($wallet) {
+                    $query->where("from", strtolower(($wallet->address)))->orWhere("to", strtolower(($wallet->address))); 
+                })->whereIn('hash', $hashs)->update(['checked' => true]);
                 $response = ['success' => true, 'message' => __('Updated'), 'data' => $result];
             } else {
-                $response = ['success' => false, 'message' => __('Id is required'), 'data' => []];
+                $response = ['success' => false, 'message' => __('hash is required'), 'data' => []];
             }
         } catch (\Exception $e) {
             $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
@@ -815,6 +819,7 @@ class ProfileController extends Controller
                     $user_token_transactions[$key] = [
                         'block' => $transfer['block'],
                         'hash' => $transfer['hash'],
+                        'checked' => $transfer['checked'],
                         'data' => [
                         ]
                     ];
@@ -837,7 +842,8 @@ class ProfileController extends Controller
                         'type' => $is_send ? 'send' : 'receive',
                         'block' => $transaction['block'],
                         'hash' => $transaction['hash'],
-                        'data' => $transaction['data']
+                        'data' => $transaction['data'],
+                        'checked' => $transaction['checked']
                     ]);
                 } else {
                     if (count($transaction['data']) == 2 && $transaction['data'][0]['from'] === strtolower($wallet->address) && $transaction['data'][1]['from'] === strtolower($wallet->address) && $transaction['data'][0]['asset'] == "GOLD" && $transaction['data'][1]['asset'] == "GOLD") {
@@ -845,13 +851,15 @@ class ProfileController extends Controller
                         'type' => "send",
                         'block' => $transaction['block'],
                         'hash' => $transaction['hash'],
-                        'data' => [$transaction['data'][0]]
+                        'data' => [$transaction['data'][0]],
+                        'checked' => $transaction['checked']
                     ]);
                     array_push($result, [
                         'type' => "send",
                         'block' => $transaction['block'],
                         'hash' => $transaction['hash'],
-                        'data' => [$transaction['data'][1]]
+                        'data' => [$transaction['data'][1]],
+                        'checked' => $transaction['checked']
                     ]);
                     continue;
                     }
@@ -869,7 +877,8 @@ class ProfileController extends Controller
                         'type' => $type,
                         'block' => $transaction['block'],
                         'hash' => $transaction['hash'],
-                        'data' => $transaction['data']
+                        'data' => $transaction['data'],
+                        'checked' => $transaction['checked']
                     ]);
                 }
             }
@@ -979,7 +988,8 @@ class ProfileController extends Controller
                         'asset' => $transfer['asset'],
                         'address' => $transfer['rawContract']['address'],
                         'value' => $transfer['value'],
-                        'decimal' => hexdec($transfer['rawContract']['decimal'])
+                        'decimal' => hexdec($transfer['rawContract']['decimal']),
+                        'checked' => false,
                     ];
                     TokenTransfer::create($token_transfer);
                     array_push($new_token_transfers, $token_transfer);

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('address');
             $table->float('value');
             $table->integer('decimal');
+            $table->boolean('checked')->nullable();
         });
     }
 
