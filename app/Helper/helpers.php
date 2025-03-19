@@ -2714,13 +2714,14 @@ function create_coin_wallet($user_id)
     }
 }
 
-function create_user_wallet($user_id, $wallet_address)
+function create_user_wallet($user_id, $wallet_address, $chainId)
 {
-    $check = Wallet::where(['user_id' => $user_id, 'address' => $wallet_address])->first();
+    $check = Wallet::where(['user_id' => $user_id, 'address' => $wallet_address, 'chainId' => $chainId])->first();
     if (empty($check)) {
         $a = Wallet::firstOrCreate([
             'user_id' => $user_id,
-            'address' => $wallet_address
+            'address' => $wallet_address,
+            'chainId' => $chainId
         ]);
     }
 }

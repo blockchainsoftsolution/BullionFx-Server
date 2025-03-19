@@ -470,8 +470,9 @@ class ProfileController extends Controller
     public function userNotificationSeen(Request $request)
     {
         $hashs = $request->hashs;
+        $chainId = $request->chainId;
         $user = Auth::user();
-        $wallet = Wallet::where('user_id', $user->id)->first();
+        $wallet = Wallet::where('user_id', $user->id)->where('chainId', $chainId)->first();
         try {
             if ($hashs) {
                 $result = TokenTransfer::where(function ($query) use ($wallet) {
@@ -908,7 +909,6 @@ class ProfileController extends Controller
                 "id" => $this->id++
             ];
             if ($this->id > 10000) $this->id = 0;
-    
             $response = Http::post($url, $payload);
             $response_decoded = $response->json();
             if ($response->successful()) {

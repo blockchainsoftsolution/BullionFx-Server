@@ -11,6 +11,7 @@ class Wallet extends Model
         'user_id',
         'address',
         'is_primary',
+        'chainId',
         'status'
     ];
 

@@ -127,7 +127,7 @@ class AuthController extends Controller
                                 $data['success'] = true;
                                 $data['message'] = __('Login successful');
                                 $data['email_verified'] = $user->is_verified;
-                                create_user_wallet(Auth::id(), $request->wallet_address);
+                                create_user_wallet(Auth::id(), $request->wallet_address, $request->chainId);
                                 if ($user->g2f_enabled == STATUS_ACTIVE) {
                                     $data['g2f_enabled'] = $user->g2f_enabled;
                                     $data['message'] = __('Please verify two factor authentication to get access ');
@@ -150,35 +150,6 @@ class AuthController extends Controller
                                 createUserActivity(Auth::user()->id, USER_ACTIVITY_LOGIN);
     
                                 return response()->json($data);
-                                // } else {
-                                //     $existsToken = User::join('user_verification_codes', 'user_verification_codes.user_id', 'users.id')
-                                //         ->where('user_verification_codes.user_id', $user->id)
-                                //         ->whereDate('user_verification_codes.expired_at', '>=', Carbon::now()->format('Y-m-d'))
-                                //         ->first();
-                                //     if (!empty($existsToken)) {
-                                //         $mail_key = $existsToken->code;
-                                //     } else {
-                                //         $mail_key = randomNumber(6);
-                                //         UserVerificationCode::create(['user_id' => $user->id, 'code' => $mail_key, 'status' => STATUS_PENDING, 'expired_at' => date('Y-m-d', strtotime('+15 days'))]);
-                                //     }
-                                //     try {
-                                //         $data['email_verified'] = $user->is_verified;
-                                //         $this->service->sendEmail($user, $mail_key, 'verify');
-    
-                                //         $data['success'] = false;
-                                //         $data['message'] = __('Your email is not verified yet. Please verify your mail.');
-                                //         Auth::logout();
-    
-                                //         return response()->json($data, 401);
-                                //     } catch (\Exception $e) {
-                                //         $data['email_verified'] = $user->is_verified;
-                                //         $data['success'] = false;
-                                //         $data['message'] = $e->getMessage();
-                                //         Auth::logout();
-    
-                                //         return response()->json($data, 500);
-                                //     }
-                                // }
                             } elseif ($user->status == STATUS_SUSPENDED) {
                                 $data['email_verified'] = 1;
                                 $data['success'] = false;
@@ -227,7 +198,7 @@ class AuthController extends Controller
                 $result = $this->service->signUpProcess($request);
                 if ($result['success']) {
                     $user = $result['data'];
-                    create_user_wallet($user->id, $request->wallet_address);
+                    create_user_wallet($user->id, $request->wallet_address, $request->chainId);
                     $kycStatus = $this->thirdPartyKYCService->createApplicant($user);
                     if ($kycStatus['success']) $response = $this->signIn($request);
                     return $response;

@@ -18,6 +18,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 use function GuzzleHttp\Psr7\stream_for;
 use RuntimeException;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,11 @@ class ThirdPartyKYCService
         $this->sandboxApiSecret = $settings['banxa_secret'];
         $this->sandboxApiKeyV2 = $settings['banxa_api_v2'];
         $this->testMode = true;
-        $this->banxa = Banxa::create($this->subdomain, $this->sandboxApiKey, $this->sandboxApiSecret, $this->testMode);
+        try {
+            $this->banxa = Banxa::create($this->subdomain, $this->sandboxApiKey, $this->sandboxApiSecret, $this->testMode);
+        } catch(\Exception $e) {
+            Log::error($e);
+        }
     }
 
     public function verifiedSumsubKYC($userId, $applicant)
@@ -101,6 +106,7 @@ class ThirdPartyKYCService
     {
         $url = '/resources/applicants/' . urlencode($applicantId) . '/requiredIdDocsStatus';
         $request = new Request('GET', $url);
+        Log::info(json_encode($url));
 
         $response = $this->sendRequest($request);
         return $this->parseBody($response);
