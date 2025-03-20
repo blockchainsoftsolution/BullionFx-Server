@@ -27,6 +27,7 @@ use App\Models\DepositeTransaction;
 use App\Models\FutureTradeLongShort;
 use App\Models\FutureTradeTransactionHistory;
 use App\Models\FutureWallet;
+use App\Models\MainActivityLog;
 use App\Models\Sell;
 use App\Models\Transaction;
 use App\Models\UserWallet;
@@ -1763,7 +1764,7 @@ function convert_to_crypt($amountInBTC, $to)
 
 
 //User Activity
-function createUserActivity($userId, $action = '', $ip = null, $device = null)
+function createUserActivity($userId, $chainId = 1, $action = '', $ip = null, $device = null)
 {
     if ($ip == null) {
         $current_ip = get_clientIp();
@@ -1789,7 +1790,10 @@ function createUserActivity($userId, $action = '', $ip = null, $device = null)
     $activity['ip_address'] = isset($current_ip) ? $current_ip : '0.0.0.0';
     $activity['source'] = $deviceType;
     $activity['location'] = '';
-    ActivityLog::create($activity);
+    switch($chainId) {
+        case 1: MainActivityLog::create($activity); break;
+        default: ActivityLog::create($activity); break;
+    }
 }
 // user image
 function show_image($id, $type)

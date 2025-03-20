@@ -172,8 +172,6 @@ Route::group([], function () {
         //     // profile
 
             Route::get('notifications', [ProfileController::class, 'userNotification']);
-            Route::get('activities', [ProfileController::class, 'getUserActivities']);
-            Route::post('add-activity', [ProfileController::class, 'addActivity']);
             Route::post('notification-seen', [ProfileController::class, 'userNotificationSeen']);
             Route::get('notification-settings', [ProfileController::class, 'userNotificationSettings']);
             Route::post('set-notification-settings', [ProfileController::class, 'setUserNotificationSettings']);

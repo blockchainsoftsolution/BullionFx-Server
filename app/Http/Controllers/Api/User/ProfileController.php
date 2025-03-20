@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\User;
 use App\Models\TokenTransfer;
 use App\Models\User;
 use App\Models\ActivityLog;
-use App\Models\Activity;
 use App\Models\Notification;
 use App\Models\ThirdPartyKycDetails;
 use App\Models\Wallet;
@@ -22,19 +21,13 @@ use App\Http\Requests\Api\apiWhiteListRequest;
 use App\Http\Requests\Api\ChangePasswordRequest;
 use App\Http\Requests\Api\ProfileUpdateRequest;
 use App\Http\Requests\Api\UpdateCurrencyRequest;
-use App\Http\Services\Logger;
 use App\Http\Services\ThirdPartyKYCService;
 use App\Http\Services\UserService;
-
-use App\Utils\StringHelper;
-
-use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -339,17 +332,6 @@ class ProfileController extends Controller
         }
         return response()->json($response);
     }
-    
-    public function getUserActivities()
-    {
-        try {
-            $result = Activity::where('user_id', '=', Auth::id())->orderBy("time", 'desc')->get();
-            $response = ['success' => true, 'message' => __('Activity'), 'data' => $result];
-        } catch (\Exception $e) {
-            $response = ['success' => false, 'message' => __('Something went wrong'), 'data' => []];
-        }
-        return response()->json($response);
-    }
 
     // user notification
     public function userNotification()
@@ -377,65 +359,6 @@ class ProfileController extends Controller
         //     $response = ['success' => false,'message' => __('Something went wrong'), 'data' => []];
         // }
         return response()->json($response);
-    }
-
-    public function addActivity(Request $request)
-    {
-        // Log::info($request);
-        try {
-            $result = Activity::create(['user_id' => Auth::id(), 'type' => $request->type, 'fromAmount' => $request->fromAmount, 'toAmount' => $request->toAmount, 'fromAsset' => $request->fromAsset,
-            'fromAssetSymbol' => $request->fromAssetSymbol, 'toAsset' => $request->toAsset, 'toAssetSymbol' => $request->toAssetSymbol, 'toAddress' => $request->toAddress, 'status' => $request->status, 'time' => $request->time, 'transactionHash' => $request->transactionHash]);
-            if ($request->type === "Sent") {
-                Notification::create([
-                    'user_id' => Auth::id(),
-                    'title' => "Sent {$request->fromAmount} {$request->fromAssetSymbol}",
-                    'notification_body' => "You sent {$request->fromAmount} {$request->fromAssetSymbol} to" . " " . StringHelper::toShortAddr($request->toAddress),
-                    'notification_option_id' => 3,
-                    'time' => $request->time
-                ]);
-            }
-            // if ($request->type === 'Received') {
-            //     Notification::create([
-            //         'user_id' => Auth::id(),
-            //         'title' => "Received {$request->toAmount} {$request->toAsset}",
-            //         'notification_body' => "You received {$request->toAmount} {$request->toAsset} from {$request->from}",
-            //         'notification_option_id' => 3,
-            //         'time' => $request->time
-            //     ]);
-            // }
-            if ($request->type === 'Withdrew') {
-                Notification::create([
-                    'user_id' => Auth::id(),
-                    'title' => "Withdrawal Complete",
-                    'notification_body' => "Your withdrawal of {$request->fromAmount} {$request->fromAssetSymbol} has been completed and will arrive in the nominated bank account soon.",
-                    'notification_option_id' => 3,
-                    'time' => $request->time
-                ]);
-            }
-            if ($request->type === 'Swapped') {
-                Notification::create([
-                    'user_id' => Auth::id(),
-                    'title' => "Swap Completed",
-                    'notification_body' => "Swapped {$request->fromAmount} {$request->fromAssetSymbol} for {$request->toAmount} {$request->toAssetSymbol}",
-                    'notification_option_id' => 3,
-                    'time' => $request->time
-                ]);
-            }
-            if ($request->type === 'Deposited') {
-                Notification::create([
-                    'user_id' => Auth::id(),
-                    'title' => "Deposit Complete",
-                    'notification_body' => "Your deposit of {$request->fromAmount} {$request->fromAssetSymbol} has been received and added to your wallet as USDC.",
-                    'notification_option_id' => 3,
-                    'time' => $request->time
-                ]);
-            }
-
-            $response = ['success' => true, 'message' => __('Add Activity Success')];
-        } catch (\Exception $e) {
-            $response = ['success' => false, 'message' => __('Something went wrong')];
-            Log::error("Notification Creation Error: " . $e->getMessage());
-        }
     }
 
     // user notification settings
@@ -798,6 +721,16 @@ class ProfileController extends Controller
     }
 
     public function userTokenTransactionHistory(Request $request) {
+
+        $trader = [
+            "1" => [
+                "0x2e6ec1bb21ca0f845b9af16d8aaf596ade3e209e"
+            ],
+            "11155111" => [
+                "0xfec17a0c39409b79a4c307acd81b84cb1ee2708b",
+                "0x3010a21ba99d326227bd9a45e8266f3cb4d786f1"
+            ]
+        ];
         
         // Get User wallet from database
         $user = Auth::user();
@@ -865,7 +798,7 @@ class ProfileController extends Controller
                     continue;
                     }
                     $type = 'contract_interaction';
-                    if ($transaction['data'][0]['from'] == strtolower(env('TRADER')) || $transaction['data'][0]['to'] == strtolower(env('TRADER')) || $transaction['data'][1]['from'] == strtolower(env('TRADER')) || $transaction['data'][1]['to'] == strtolower(env('TRADER'))) {
+                    if (in_array($transaction['data'][0]['from'], $trader[$chain_id]) || in_array($transaction['data'][0]['to'], $trader[$chain_id]) || in_array($transaction['data'][1]['from'], $trader[$chain_id]) || in_array($transaction['data'][1]['to'], $trader[$chain_id])) {
                         $type = 'swap';
                         foreach($transaction['data'] as $each) {
                             if ($each['asset'] != 'USDC' && $each['asset'] != 'GOLD') {

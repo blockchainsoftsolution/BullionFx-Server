@@ -38,16 +38,19 @@ class PublicController extends Controller
         }
     }
 
-    /**
-     * token list
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function tokenList()
-    {
+    private function getGoldToken($chainId) {
         $token_prices = $this->getTokenPrices();
-
-        $token_list = [
-            [
+        switch ($chainId) {
+            case 1: return [
+                'coingecko' => "pax-gold",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/gold.svg",
+                'symbol' => "GOLD",
+                'fullName' => "Gold",
+                'price' => $token_prices['pax-gold']['usd'] ?? 0,
+                'isShow' => true,
+                'address' => "0xA5D5FA1307948fa447CA87601aD646bde66b362C",
+            ];
+            default: return [
                 'coingecko' => "pax-gold",
                 'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/gold.svg",
                 'symbol' => "GOLD",
@@ -55,8 +58,23 @@ class PublicController extends Controller
                 'price' => $token_prices['pax-gold']['usd'] ?? 0,
                 'isShow' => true,
                 'address' => "0xC2F25646323F4F1e03cdDf03b886Ad4E5043F214",
-            ],
-            [
+            ];
+        }
+    }
+
+    private function getUsdcToken($chainId) {
+        $token_prices = $this->getTokenPrices();
+        switch ($chainId) {
+            case 1: return [
+                'coingecko' => "usd-coin",
+                'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/usdc.svg",
+                'symbol' => "USDC",
+                'fullName' => "USD Coin",
+                'price' => $token_prices['usd-coin']['usd'] ?? 0,
+                'isShow' => true,
+                'address' => "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            ];
+            default: return [
                 'coingecko' => "usd-coin",
                 'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/usdc.svg",
                 'symbol' => "USDC",
@@ -64,7 +82,21 @@ class PublicController extends Controller
                 'price' => $token_prices['usd-coin']['usd'] ?? 0,
                 'isShow' => true,
                 'address' => "0x41d393ae236d08155301529a33B15DE4504696c7",
-            ],
+            ];
+        }
+    }
+
+    /**
+     * token list
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function tokenList(Request $request)
+    {
+        $chainId = (int) $request->input('chain_id');
+
+        $token_list = [
+            $this->getGoldToken($chainId),
+            $this->getUsdcToken($chainId),
             // [
             //     'coingecko' => "ethereum",
             //     'icon' => "https://raw.githubusercontent.com/blockchainsoftsolution/bullionfx-images/main/coins/eth.svg",

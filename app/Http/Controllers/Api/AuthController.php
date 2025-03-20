@@ -147,7 +147,7 @@ class AuthController extends Controller
     
                                 $data['user'] = $user;
                                 $data['user']->photo = show_image_path($user->photo, IMG_USER_PATH);
-                                createUserActivity(Auth::user()->id, USER_ACTIVITY_LOGIN);
+                                createUserActivity(Auth::user()->id, (int) $request->chainId, USER_ACTIVITY_LOGIN);
     
                                 return response()->json($data);
                             } elseif ($user->status == STATUS_SUSPENDED) {
